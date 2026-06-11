@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/buffer-post.js": {
+      "memory": 256,
+      "maxDuration": 30
+    }
+  }
+}
