@@ -349,8 +349,12 @@ async function publishToBuffer(){
   btn.disabled=true; btn.textContent="Publishing...";
   const statusBox = document.getElementById("bufferStatus");
   statusBox.innerHTML=""; statusBox.style.display="block";
+  const imageUrlInput = document.getElementById("pubImageUrl");
+  const imageUrl = imageUrlInput ? imageUrlInput.value.trim() : (selectedProduct?.image||null);
   const payload = {
-    action:"publish", profileIds:ids, platforms:{}
+    action:"publish", profileIds:ids,
+    imageUrl: imageUrl||null,
+    platforms:{}
   };
   BUFFER_PLATFORMS.forEach(p=>{ if(pack[p]&&!pack[p].error) payload.platforms[p]=pack[p]; });
   try{
@@ -388,13 +392,23 @@ function renderPublishBuffer(){
   const card=document.createElement("div"); card.className="card";
   if(Object.keys(ids).length>0){
     const mapped=Object.keys(ids).map(p=>BUFFER_LABELS[p]).join(", ");
+    const hasShopImg = selectedProduct?.image;
     card.innerHTML=`<h2>3 · Publish</h2>
-      <div class="hint">Queues ${mapped} in Buffer. Pinterest sends all ${ids.pinterest?"3 pin variations":"pins"}. Images need to be added in Buffer before sending.</div>
+      <div class="hint">Queues ${mapped} in Buffer. Instagram requires an image.</div>
+      <div class="secthead">Post image</div>
+      ${hasShopImg
+        ? `<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+            <img src="${selectedProduct.image}" style="width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--line)">
+            <div class="hint" style="margin:0">Using your Shopify product image. Or paste a different public URL below.</div>
+           </div>`
+        : `<div class="hint">No product image found. Paste a public image URL to include one.</div>`
+      }
+      <input id="pubImageUrl" type="url" placeholder="https://yourimage.com/photo.jpg" value="${hasShopImg?selectedProduct.image:''}" style="margin-bottom:10px">
       <button class="btn3" id="bufferBtn" onclick="publishToBuffer()">🚀 Publish to Buffer</button>
       <div id="bufferStatus" style="display:none;margin-top:10px"></div>`;
   }else{
     card.innerHTML=`<h2>3 · Publish</h2>
-      <div class="hint">Add your Buffer Personal Key to Netlify env vars, then Load channels in Settings to enable one-tap publishing.</div>`;
+      <div class="hint">Add your Buffer Personal Key to Vercel env vars, then Load channels in Settings to enable one-tap publishing.</div>`;
   }
   w.appendChild(card);
 }
