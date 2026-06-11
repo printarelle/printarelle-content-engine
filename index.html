@@ -77,9 +77,10 @@ footer{text-align:center;font-size:11px;color:var(--inksoft);font-style:italic;m
     <input id="shopDomainInput" placeholder="your-store.myshopify.com">
     <button class="btn3" style="margin-bottom:8px" onclick="saveSettings();localStorage.removeItem('pce_products_'+getShop());loadAllProducts()">Save &amp; reload products</button>
     <div class="secthead">Buffer publishing (optional)</div>
-    <div class="hint">Get your token: <b>buffer.com/developers/apps</b> → Create app → copy Access Token. Stored only in this browser, never shared.</div>
-    <input id="bufferToken" type="password" placeholder="Buffer access token">
-    <button class="btn3" id="loadChBtn" onclick="loadBufferChannels()" style="margin-bottom:8px">Load my Buffer channels</button>
+    <div class="hint">One-tap publishing to Instagram, Facebook and Pinterest via your Buffer queue.</div>
+    <div id="bufferAuthStatus"></div>
+    <button class="btn3" onclick="connectBuffer()" style="margin-bottom:6px">🔗 Connect with Buffer</button>
+    <button class="btn3" id="loadChBtn" onclick="loadBufferChannels()" style="display:none;margin-bottom:8px">Load my channels</button>
     <div id="bufferChannels"></div>
     <button class="btn3" onclick="saveSettings()">Save all settings</button>
   </div>
@@ -279,16 +280,13 @@ let selectedStyles=[], selectedSizes=["4:5"], previewStyle=null, pack=null, pack
 function loadSettings(){
   document.getElementById("apiKey").value = localStorage.getItem("pce_key")||"";
   document.getElementById("shopDomainInput").value = localStorage.getItem("pce_shop_domain")||"rpmffu-te.myshopify.com";
-  document.getElementById("bufferToken").value = localStorage.getItem("pce_buffer_token")||"";
+  refreshBufferStatus();
   renderBufferChannels();
-  refreshStatus();
 }
 function saveSettings(){
   localStorage.setItem("pce_key", document.getElementById("apiKey").value.trim());
   const dom = document.getElementById("shopDomainInput").value.trim().replace(/^https?:\/\//,"").replace(/\/.*$/,"");
   if(dom) localStorage.setItem("pce_shop_domain", dom);
-  const bt = document.getElementById("bufferToken").value.trim();
-  if(bt) localStorage.setItem("pce_buffer_token", bt);
   refreshStatus();
   document.getElementById("settings").removeAttribute("open");
 }
@@ -302,21 +300,70 @@ function refreshStatus(){
 // ============ BUFFER ============
 const BUFFER_PLATFORMS = ["instagram","facebook","pinterest"];
 const BUFFER_LABELS = {instagram:"Instagram",facebook:"Facebook",pinterest:"Pinterest"};
+const APP_URL = "https://printarelle.netlify.app";
+
+function getBufferToken(){ return localStorage.getItem("pce_buffer_token")||""; }
+
+function connectBuffer(){
+  const popup = window.open(
+    "/.netlify/functions/buffer-auth?start=true",
+    "buffer_oauth",
+    "width=620,height=720,left=200,top=80,scrollbars=yes"
+  );
+  if(!popup){ alert("Please allow popups for this site to connect Buffer."); return; }
+  window.addEventListener("message", function handler(e){
+    if(e.origin !== APP_URL) return;
+    if(!e.data || e.data.type !== "buffer_auth") return;
+    window.removeEventListener("message", handler);
+    if(e.data.token){
+      localStorage.setItem("pce_buffer_token", e.data.token);
+      refreshBufferStatus();
+      document.getElementById("settings").setAttribute("open","");
+    } else if(e.data.error){
+      alert("Buffer connection failed: "+e.data.error);
+    }
+  });
+}
+
+// Handle token passed via URL hash (fallback for no-opener scenario)
+function checkHashToken(){
+  if(!window.location.hash) return;
+  const params = new URLSearchParams(window.location.hash.slice(1));
+  const t = params.get("buffer_token");
+  if(t){
+    localStorage.setItem("pce_buffer_token", decodeURIComponent(t));
+    window.location.hash = "";
+    refreshBufferStatus();
+  }
+}
+
+function refreshBufferStatus(){
+  const el = document.getElementById("bufferAuthStatus");
+  const btn = document.getElementById("loadChBtn");
+  if(!el) return;
+  const token = getBufferToken();
+  if(token){
+    el.innerHTML = '<div class="note" style="color:var(--sage);margin-bottom:8px">✓ Buffer connected. Load your channels below.</div>';
+    if(btn) btn.style.display = "block";
+  } else {
+    el.innerHTML = '<div class="note" style="margin-bottom:8px">Not connected yet.</div>';
+    if(btn) btn.style.display = "none";
+  }
+}
 
 async function loadBufferChannels(){
-  const token = document.getElementById("bufferToken").value.trim();
-  if(!token){ alert("Paste your Buffer access token first."); return; }
-  localStorage.setItem("pce_buffer_token", token);
+  const token = getBufferToken();
+  if(!token){ alert("Connect Buffer first."); return; }
   const btn = document.getElementById("loadChBtn");
   btn.textContent="Loading..."; btn.disabled=true;
   try{
     const res = await fetch("/.netlify/functions/buffer-post",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({action:"profiles"})
+      body: JSON.stringify({action:"profiles", accessToken:token})
     });
     const data = await res.json();
-    if(!res.ok) throw new Error(data.error||"Failed to load channels");
+    if(!res.ok) throw new Error(data.error||"Failed");
     localStorage.setItem("pce_buffer_profiles", JSON.stringify(data.profiles));
     renderBufferChannels();
   }catch(e){
@@ -336,7 +383,7 @@ function renderBufferChannels(){
     const options = profiles.map(p=>`<option value="${p.id}" ${saved[plat]===p.id?"selected":""}>${p.service} — ${p.username}</option>`).join("");
     html += `<div style="margin-bottom:8px"><label class="hint" style="display:block;margin-bottom:4px">${BUFFER_LABELS[plat]}</label>
       <select onchange="saveBufferMapping('${plat}',this.value)" style="font-family:'Lora',serif;width:100%;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--cream);font-size:13px">
-        <option value="">Not using Buffer for this</option>${options}
+        <option value="">— Skip this platform —</option>${options}
       </select></div>`;
   });
   html += '<div class="note" style="margin-top:6px">✓ Mapped. Tap Save all settings.</div>';
@@ -350,29 +397,25 @@ function saveBufferMapping(platform, profileId){
 }
 
 async function publishToBuffer(){
+  const token = getBufferToken();
   const ids = JSON.parse(localStorage.getItem("pce_buffer_ids")||"{}");
+  if(!token){ alert("Connect Buffer in Settings first."); return; }
   if(!Object.keys(ids).length){ alert("Map your Buffer channels in Settings first."); return; }
   if(!pack) return;
   const btn = document.getElementById("bufferBtn");
   btn.disabled=true; btn.textContent="Publishing...";
   const statusBox = document.getElementById("bufferStatus");
-  statusBox.innerHTML="";
-  statusBox.style.display="block";
-
+  statusBox.innerHTML=""; statusBox.style.display="block";
   const payload = {
-    action: "publish",
-    profileIds: ids,
+    action:"publish", accessToken:token,
+    profileIds:ids,
     imageUrl: selectedProduct?.image||null,
-    platforms: {}
+    platforms:{}
   };
-  BUFFER_PLATFORMS.forEach(p=>{
-    if(pack[p] && !pack[p].error) payload.platforms[p] = pack[p];
-  });
-
+  BUFFER_PLATFORMS.forEach(p=>{ if(pack[p]&&!pack[p].error) payload.platforms[p]=pack[p]; });
   try{
     const res = await fetch("/.netlify/functions/buffer-post",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
+      method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
     const data = await res.json();
@@ -380,10 +423,10 @@ async function publishToBuffer(){
     const r = data.results||{};
     let html="";
     if(r.instagram) html+=statusLine("Instagram",r.instagram);
-    if(r.facebook) html+=statusLine("Facebook",r.facebook);
+    if(r.facebook)  html+=statusLine("Facebook",r.facebook);
     if(r.pinterest&&Array.isArray(r.pinterest)){
       const ok=r.pinterest.filter(x=>x.success).length;
-      html+=statusLine("Pinterest",ok===3?{success:true}:{error:ok+" of 3 pins queued"});
+      html+=statusLine("Pinterest ("+ok+"/3 pins)",ok===r.pinterest.length?{success:true}:{error:ok+" of "+r.pinterest.length+" queued"});
     }
     statusBox.innerHTML=html;
   }catch(e){
@@ -392,7 +435,7 @@ async function publishToBuffer(){
   btn.disabled=false; btn.textContent="🚀 Publish to Buffer";
 }
 
-function statusLine(name, result){
+function statusLine(name,result){
   return result.success
     ? `<div style="font-size:13px;color:var(--sage);margin-bottom:4px">✓ ${name} queued in Buffer</div>`
     : `<div style="font-size:13px;color:var(--rose);margin-bottom:4px">✗ ${name}: ${esc(result.error||"error")}</div>`;
@@ -403,15 +446,15 @@ function renderPublishBuffer(){
   if(!pack||!Object.keys(pack).length) return;
   const ids=JSON.parse(localStorage.getItem("pce_buffer_ids")||"{}");
   const card=document.createElement("div"); card.className="card";
-  if(Object.keys(ids).length>0){
+  if(Object.keys(ids).length>0&&getBufferToken()){
     const mapped=Object.keys(ids).map(p=>BUFFER_LABELS[p]).join(", ");
     card.innerHTML=`<h2>3 · Publish</h2>
-      <div class="hint">Will queue ${mapped} in your Buffer schedule. Pinterest sends all 3 pin variations.</div>
+      <div class="hint">Queues ${mapped} in Buffer. Pinterest sends all 3 pin variations.</div>
       <button class="btn3" id="bufferBtn" onclick="publishToBuffer()">🚀 Publish to Buffer</button>
       <div id="bufferStatus" style="display:none;margin-top:10px"></div>`;
   }else{
     card.innerHTML=`<h2>3 · Publish</h2>
-      <div class="hint">Add your Buffer token and map your channels in Settings to enable one-tap publishing.</div>`;
+      <div class="hint">Connect Buffer in Settings and map your channels to enable one-tap publishing.</div>`;
   }
   w.appendChild(card);
 }
@@ -822,7 +865,7 @@ function renderHistory(){
 }
 
 // ============ INIT ============
-loadSettings(); renderChips(); renderHistory(); loadAllProducts();
+checkHashToken(); loadSettings(); renderChips(); renderHistory(); loadAllProducts();
 if(!localStorage.getItem("pce_key")) document.getElementById("settings").setAttribute("open","");
 </script>
 </body>
