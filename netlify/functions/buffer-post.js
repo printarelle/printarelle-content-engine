@@ -1,51 +1,35 @@
-// Printarelle Content Engine — Buffer Publishing Function
-// Requires BUFFER_TOKEN environment variable in Netlify.
+// Printarelle Content Engine — Buffer Publishing Proxy
+// Token is sent from the browser (obtained via OAuth flow in buffer-auth.js)
+// Requires: BUFFER_CLIENT_ID + BUFFER_CLIENT_SECRET in Netlify env vars (for auth only)
 
 exports.handler = async (event) => {
   const headers = {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin":  "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
   };
-
   if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "" };
-  if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
+  if (event.httpMethod !== "POST")    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
 
-  const TOKEN = process.env.BUFFER_TOKEN;
-  if (!TOKEN) return {
-    statusCode: 500, headers,
-    body: JSON.stringify({ error: "BUFFER_TOKEN not set in Netlify environment variables." }),
-  };
-
-  // Buffer API — try v1 with Bearer auth header (current method)
   const API = "https://api.bufferapp.com/1";
-  const authHeaders = {
-    "Authorization": "Bearer " + TOKEN,
-    "Content-Type": "application/x-www-form-urlencoded",
-  };
 
   try {
-    const body = JSON.parse(event.body || "{}");
-    const { action, profileIds, platforms, imageUrl } = body;
+    const body  = JSON.parse(event.body || "{}");
+    const TOKEN = body.accessToken;
+    if (!TOKEN) return { statusCode: 400, headers, body: JSON.stringify({ error: "No accessToken provided. Please reconnect Buffer in Settings." }) };
+
+    const authHeader = { "Authorization": "Bearer " + TOKEN };
 
     // ── Get profiles ─────────────────────────────────────────────────────────
-    if (action === "profiles") {
-      const res = await fetch(`${API}/profiles.json`, {
-        headers: { "Authorization": "Bearer " + TOKEN }
-      });
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); } catch(e) {
-        throw new Error("Buffer returned non-JSON: " + text.slice(0, 200));
-      }
-      if (!res.ok) throw new Error(
-        "Buffer " + res.status + ": " + (data.message || data.error || JSON.stringify(data))
-      );
-      const profiles = Array.isArray(data) ? data : (data.data || []);
+    if (body.action === "profiles") {
+      const res  = await fetch(`${API}/profiles.json`, { headers: authHeader });
+      const data = await res.json();
+      if (!res.ok) throw new Error("Buffer " + res.status + ": " + (data.message || data.error || JSON.stringify(data)));
+      const list = Array.isArray(data) ? data : (data.data || []);
       return {
         statusCode: 200, headers,
         body: JSON.stringify({
-          profiles: profiles.map((p) => ({
+          profiles: list.map(p => ({
             id: p.id,
             service: p.service,
             username: p.formatted_username || p.service_username || p.service_id || p.id,
@@ -55,22 +39,21 @@ exports.handler = async (event) => {
     }
 
     // ── Publish ───────────────────────────────────────────────────────────────
-    if (action === "publish") {
+    if (body.action === "publish") {
+      const { profileIds, platforms, imageUrl } = body;
       const results = {};
 
       const post = async (profileId, text, extra = {}) => {
         const params = new URLSearchParams({ "profile_ids[]": profileId, text });
         if (imageUrl) params.append("media[photo]", imageUrl);
         Object.entries(extra).forEach(([k, v]) => params.append(k, v));
-        const res = await fetch(`${API}/updates/create.json`, {
-          method: "POST",
-          headers: authHeaders,
-          body: params,
+        const r = await fetch(`${API}/updates/create.json`, {
+          method:  "POST",
+          headers: { ...authHeader, "Content-Type": "application/x-www-form-urlencoded" },
+          body:    params,
         });
-        const resText = await res.text();
-        let data;
-        try { data = JSON.parse(resText); } catch(e) { data = { message: resText }; }
-        return res.ok ? { success: true } : { error: data.message || data.error || "Error " + res.status };
+        const d = await r.json();
+        return r.ok ? { success: true } : { error: d.message || d.error || "Error " + r.status };
       };
 
       if (platforms?.instagram && profileIds?.instagram)
@@ -81,18 +64,14 @@ exports.handler = async (event) => {
 
       if (platforms?.pinterest?.pins && profileIds?.pinterest) {
         results.pinterest = [];
-        for (const pin of platforms.pinterest.pins) {
-          const r = await post(profileIds.pinterest, pin.description, {
-            "extra_data[title]": pin.title || ""
-          });
-          results.pinterest.push(r);
-        }
+        for (const pin of platforms.pinterest.pins)
+          results.pinterest.push(await post(profileIds.pinterest, pin.description, { "extra_data[title]": pin.title || "" }));
       }
 
       return { statusCode: 200, headers, body: JSON.stringify({ results }) };
     }
 
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action: " + action }) };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action: " + body.action }) };
 
   } catch (e) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
