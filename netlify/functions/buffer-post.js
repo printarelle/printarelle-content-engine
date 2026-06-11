@@ -79,7 +79,7 @@ exports.handler = async (event) => {
 
       const createPost = async (channelId, text) => {
         const data = await gql(TOKEN, `
-          mutation CreatePost($channelId: String!, $text: String!) {
+          mutation CreatePost($channelId: ChannelId!, $text: String!) {
             createPost(input: {
               channelId: $channelId,
               text: $text,
