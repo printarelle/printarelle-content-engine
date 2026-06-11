@@ -1,5 +1,5 @@
-// Printarelle Content Engine — Buffer GraphQL API
-// Requires: BUFFER_TOKEN in Netlify environment variables (Personal Key from Buffer Settings → API)
+// Printarelle Content Engine — Buffer GraphQL API (Vercel Function)
+// Requires: BUFFER_TOKEN in Vercel environment variables (Personal Key from Buffer Settings → API)
 
 const API = "https://api.buffer.com";
 
@@ -17,36 +17,28 @@ const gql = async (token, query, variables = {}) => {
   return data.data;
 };
 
-exports.handler = async (event) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Content-Type": "application/json",
-  };
-  if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "" };
-  if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
+module.exports = async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const TOKEN = process.env.BUFFER_TOKEN;
-  if (!TOKEN) return {
-    statusCode: 500, headers,
-    body: JSON.stringify({ error: "BUFFER_TOKEN not set. Add your Buffer Personal Key to Netlify → Site settings → Environment variables." }),
-  };
+  if (!TOKEN) return res.status(500).json({
+    error: "BUFFER_TOKEN not set. Add your Buffer Personal Key to Vercel → Project → Settings → Environment Variables.",
+  });
 
   try {
-    const body = JSON.parse(event.body || "{}");
+    const body = req.body || {};
 
-    // ── Get channels (requires org ID first) ─────────────────────────────────
+    // ── Get channels ──────────────────────────────────────────────────────────
     if (body.action === "profiles") {
-
-      // Step 1: get org ID
-      const orgData = await gql(TOKEN, `
-        query { account { organizations { id name } } }
-      `);
+      const orgData = await gql(TOKEN, `query { account { organizations { id name } } }`);
       const orgs = orgData.account?.organizations || [];
       if (!orgs.length) throw new Error("No organisations found in your Buffer account.");
       const orgId = orgs[0].id;
 
-      // Step 2: get channels for that org
       const chData = await gql(TOKEN, `
         query GetChannels($orgId: OrganizationId!) {
           channels(input: { organizationId: $orgId }) {
@@ -54,25 +46,21 @@ exports.handler = async (event) => {
             name
             displayName
             service
-            avatar
           }
         }
       `, { orgId });
 
       const channels = chData.channels || [];
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({
-          profiles: channels.map(c => ({
-            id: c.id,
-            service: c.service || "unknown",
-            username: c.displayName || c.name || c.id,
-          })),
-        }),
-      };
+      return res.status(200).json({
+        profiles: channels.map(c => ({
+          id: c.id,
+          service: c.service || "unknown",
+          username: c.displayName || c.name || c.id,
+        })),
+      });
     }
 
-    // ── Create posts ──────────────────────────────────────────────────────────
+    // ── Publish ───────────────────────────────────────────────────────────────
     if (body.action === "publish") {
       const { profileIds, platforms } = body;
       const results = {};
@@ -115,12 +103,12 @@ exports.handler = async (event) => {
         }
       }
 
-      return { statusCode: 200, headers, body: JSON.stringify({ results }) };
+      return res.status(200).json({ results });
     }
 
-    return { statusCode: 400, headers, body: JSON.stringify({ error: "Unknown action: " + body.action }) };
+    return res.status(400).json({ error: "Unknown action: " + body.action });
 
   } catch (e) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
+    return res.status(500).json({ error: e.message });
   }
 };
