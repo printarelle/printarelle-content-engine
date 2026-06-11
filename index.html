@@ -302,7 +302,7 @@ async function loadBufferChannels(){
   const btn = document.getElementById("loadChBtn");
   btn.textContent="Loading..."; btn.disabled=true;
   try{
-    const res = await fetch("/.netlify/functions/buffer-post",{
+    const res = await fetch("/api/buffer-post",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body: JSON.stringify({action:"profiles"})
@@ -354,7 +354,7 @@ async function publishToBuffer(){
   };
   BUFFER_PLATFORMS.forEach(p=>{ if(pack[p]&&!pack[p].error) payload.platforms[p]=pack[p]; });
   try{
-    const res = await fetch("/.netlify/functions/buffer-post",{
+    const res = await fetch("/api/buffer-post",{
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify(payload)
     });
