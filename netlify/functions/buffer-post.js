@@ -1,5 +1,5 @@
 // Printarelle Content Engine — Buffer Publishing Function
-// Netlify serverless function. Requires BUFFER_TOKEN environment variable in Netlify.
+// Requires BUFFER_TOKEN environment variable in Netlify.
 
 exports.handler = async (event) => {
   const headers = {
@@ -14,68 +14,77 @@ exports.handler = async (event) => {
   const TOKEN = process.env.BUFFER_TOKEN;
   if (!TOKEN) return {
     statusCode: 500, headers,
-    body: JSON.stringify({ error: "BUFFER_TOKEN not set. Go to Netlify → Site settings → Environment variables and add BUFFER_TOKEN." }),
+    body: JSON.stringify({ error: "BUFFER_TOKEN not set in Netlify environment variables." }),
   };
 
+  // Buffer API — try v1 with Bearer auth header (current method)
   const API = "https://api.bufferapp.com/1";
+  const authHeaders = {
+    "Authorization": "Bearer " + TOKEN,
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
 
   try {
     const body = JSON.parse(event.body || "{}");
     const { action, profileIds, platforms, imageUrl } = body;
 
-    // ── Get Buffer profiles ──────────────────────────────────────────────────
+    // ── Get profiles ─────────────────────────────────────────────────────────
     if (action === "profiles") {
-      const res = await fetch(`${API}/profiles.json?access_token=${TOKEN}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Buffer returned " + res.status);
+      const res = await fetch(`${API}/profiles.json`, {
+        headers: { "Authorization": "Bearer " + TOKEN }
+      });
+      const text = await res.text();
+      let data;
+      try { data = JSON.parse(text); } catch(e) {
+        throw new Error("Buffer returned non-JSON: " + text.slice(0, 200));
+      }
+      if (!res.ok) throw new Error(
+        "Buffer " + res.status + ": " + (data.message || data.error || JSON.stringify(data))
+      );
+      const profiles = Array.isArray(data) ? data : (data.data || []);
       return {
         statusCode: 200, headers,
         body: JSON.stringify({
-          profiles: data.map((p) => ({
+          profiles: profiles.map((p) => ({
             id: p.id,
             service: p.service,
-            username: p.formatted_username || p.service_username || p.service_id,
+            username: p.formatted_username || p.service_username || p.service_id || p.id,
           })),
         }),
       };
     }
 
-    // ── Publish pack ─────────────────────────────────────────────────────────
+    // ── Publish ───────────────────────────────────────────────────────────────
     if (action === "publish") {
       const results = {};
 
       const post = async (profileId, text, extra = {}) => {
-        const params = new URLSearchParams({ access_token: TOKEN, "profile_ids[]": profileId, text });
+        const params = new URLSearchParams({ "profile_ids[]": profileId, text });
         if (imageUrl) params.append("media[photo]", imageUrl);
         Object.entries(extra).forEach(([k, v]) => params.append(k, v));
         const res = await fetch(`${API}/updates/create.json`, {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          headers: authHeaders,
           body: params,
         });
-        const data = await res.json();
-        return res.ok ? { success: true } : { error: data.message || "Buffer error" };
+        const resText = await res.text();
+        let data;
+        try { data = JSON.parse(resText); } catch(e) { data = { message: resText }; }
+        return res.ok ? { success: true } : { error: data.message || data.error || "Error " + res.status };
       };
 
-      // Instagram
-      if (platforms?.instagram && profileIds?.instagram) {
+      if (platforms?.instagram && profileIds?.instagram)
         results.instagram = await post(profileIds.instagram, platforms.instagram.caption);
-      }
 
-      // Facebook
-      if (platforms?.facebook && profileIds?.facebook) {
+      if (platforms?.facebook && profileIds?.facebook)
         results.facebook = await post(profileIds.facebook, platforms.facebook.caption);
-      }
 
-      // Pinterest — 3 pins
       if (platforms?.pinterest?.pins && profileIds?.pinterest) {
         results.pinterest = [];
         for (const pin of platforms.pinterest.pins) {
-          const r = await post(
-            profileIds.pinterest,
-            pin.description,
-            { "extra_data[title]": pin.title || "" }
-          );
+          const r = await post(profileIds.pinterest, pin.description, {
+            "extra_data[title]": pin.title || ""
+          });
           results.pinterest.push(r);
         }
       }
