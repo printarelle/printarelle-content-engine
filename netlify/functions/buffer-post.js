@@ -1,71 +1,105 @@
-// Printarelle Content Engine — Buffer Publishing Proxy
-// Token is sent from the browser (obtained via OAuth flow in buffer-auth.js)
-// Requires: BUFFER_CLIENT_ID + BUFFER_CLIENT_SECRET in Netlify env vars (for auth only)
+// Printarelle Content Engine — Buffer GraphQL API
+// Uses Buffer's new GraphQL API at https://api.buffer.com
+// Requires: BUFFER_TOKEN in Netlify environment variables (Personal Key from Buffer Settings → API)
+
+const API = "https://api.buffer.com";
+
+const gql = async (token, query, variables = {}) => {
+  const res = await fetch(API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token,
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+  const data = await res.json();
+  if (data.errors) throw new Error(data.errors.map(e => e.message).join(", "));
+  return data.data;
+};
 
 exports.handler = async (event) => {
   const headers = {
-    "Access-Control-Allow-Origin":  "*",
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json",
   };
   if (event.httpMethod === "OPTIONS") return { statusCode: 200, headers, body: "" };
-  if (event.httpMethod !== "POST")    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
+  if (event.httpMethod !== "POST") return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
 
-  const API = "https://api.bufferapp.com/1";
+  const TOKEN = process.env.BUFFER_TOKEN;
+  if (!TOKEN) return {
+    statusCode: 500, headers,
+    body: JSON.stringify({ error: "BUFFER_TOKEN not set. Add your Buffer Personal Key to Netlify → Site settings → Environment variables." }),
+  };
 
   try {
-    const body  = JSON.parse(event.body || "{}");
-    const TOKEN = body.accessToken;
-    if (!TOKEN) return { statusCode: 400, headers, body: JSON.stringify({ error: "No accessToken provided. Please reconnect Buffer in Settings." }) };
+    const body = JSON.parse(event.body || "{}");
 
-    const authHeader = { "Authorization": "Bearer " + TOKEN };
-
-    // ── Get profiles ─────────────────────────────────────────────────────────
+    // ── Get channels ────────────────────────────────────────────────────────
     if (body.action === "profiles") {
-      const res  = await fetch(`${API}/profiles.json`, { headers: authHeader });
-      const data = await res.json();
-      if (!res.ok) throw new Error("Buffer " + res.status + ": " + (data.message || data.error || JSON.stringify(data)));
-      const list = Array.isArray(data) ? data : (data.data || []);
+      const data = await gql(TOKEN, `{
+        channels {
+          id
+          name
+          service
+          serviceType
+        }
+      }`);
+      const channels = data.channels || [];
       return {
         statusCode: 200, headers,
         body: JSON.stringify({
-          profiles: list.map(p => ({
-            id: p.id,
-            service: p.service,
-            username: p.formatted_username || p.service_username || p.service_id || p.id,
+          profiles: channels.map(c => ({
+            id: c.id,
+            service: c.service || c.serviceType,
+            username: c.name || c.id,
           })),
         }),
       };
     }
 
-    // ── Publish ───────────────────────────────────────────────────────────────
+    // ── Create posts ─────────────────────────────────────────────────────────
     if (body.action === "publish") {
-      const { profileIds, platforms, imageUrl } = body;
+      const { profileIds, platforms } = body;
       const results = {};
 
-      const post = async (profileId, text, extra = {}) => {
-        const params = new URLSearchParams({ "profile_ids[]": profileId, text });
-        if (imageUrl) params.append("media[photo]", imageUrl);
-        Object.entries(extra).forEach(([k, v]) => params.append(k, v));
-        const r = await fetch(`${API}/updates/create.json`, {
-          method:  "POST",
-          headers: { ...authHeader, "Content-Type": "application/x-www-form-urlencoded" },
-          body:    params,
-        });
-        const d = await r.json();
-        return r.ok ? { success: true } : { error: d.message || d.error || "Error " + r.status };
+      const createPost = async (channelId, text) => {
+        const CREATE = `
+          mutation CreatePost($channelId: String!, $text: String!) {
+            createPost(input: {
+              channelId: $channelId,
+              text: $text,
+              schedulingType: automatic,
+              mode: addToQueue
+            }) {
+              ... on PostActionSuccess { post { id } }
+              ... on MutationError { message }
+            }
+          }`;
+        const data = await gql(TOKEN, CREATE, { channelId, text });
+        const result = data.createPost;
+        if (result.message) throw new Error(result.message);
+        return { success: true, id: result.post?.id };
       };
 
-      if (platforms?.instagram && profileIds?.instagram)
-        results.instagram = await post(profileIds.instagram, platforms.instagram.caption);
+      if (platforms?.instagram && profileIds?.instagram) {
+        try { results.instagram = await createPost(profileIds.instagram, platforms.instagram.caption); }
+        catch(e) { results.instagram = { error: e.message }; }
+      }
 
-      if (platforms?.facebook && profileIds?.facebook)
-        results.facebook = await post(profileIds.facebook, platforms.facebook.caption);
+      if (platforms?.facebook && profileIds?.facebook) {
+        try { results.facebook = await createPost(profileIds.facebook, platforms.facebook.caption); }
+        catch(e) { results.facebook = { error: e.message }; }
+      }
 
       if (platforms?.pinterest?.pins && profileIds?.pinterest) {
         results.pinterest = [];
-        for (const pin of platforms.pinterest.pins)
-          results.pinterest.push(await post(profileIds.pinterest, pin.description, { "extra_data[title]": pin.title || "" }));
+        for (const pin of platforms.pinterest.pins) {
+          const text = (pin.title ? pin.title + "\n\n" : "") + pin.description;
+          try { results.pinterest.push(await createPost(profileIds.pinterest, text)); }
+          catch(e) { results.pinterest.push({ error: e.message }); }
+        }
       }
 
       return { statusCode: 200, headers, body: JSON.stringify({ results }) };
