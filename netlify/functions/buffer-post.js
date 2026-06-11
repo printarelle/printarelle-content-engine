@@ -1,5 +1,4 @@
 // Printarelle Content Engine — Buffer GraphQL API
-// Uses Buffer's new GraphQL API at https://api.buffer.com
 // Requires: BUFFER_TOKEN in Netlify environment variables (Personal Key from Buffer Settings → API)
 
 const API = "https://api.buffer.com";
@@ -36,36 +35,50 @@ exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
 
-    // ── Get channels ────────────────────────────────────────────────────────
+    // ── Get channels (requires org ID first) ─────────────────────────────────
     if (body.action === "profiles") {
-      const data = await gql(TOKEN, `{
-        channels {
-          id
-          name
-          service
-          serviceType
+
+      // Step 1: get org ID
+      const orgData = await gql(TOKEN, `
+        query { account { organizations { id name } } }
+      `);
+      const orgs = orgData.account?.organizations || [];
+      if (!orgs.length) throw new Error("No organisations found in your Buffer account.");
+      const orgId = orgs[0].id;
+
+      // Step 2: get channels for that org
+      const chData = await gql(TOKEN, `
+        query GetChannels($orgId: String!) {
+          channels(input: { organizationId: $orgId }) {
+            id
+            name
+            displayName
+            service
+            avatar
+          }
         }
-      }`);
-      const channels = data.channels || [];
+      `, { orgId });
+
+      const channels = chData.channels || [];
       return {
         statusCode: 200, headers,
         body: JSON.stringify({
           profiles: channels.map(c => ({
             id: c.id,
-            service: c.service || c.serviceType,
-            username: c.name || c.id,
+            service: c.service || "unknown",
+            username: c.displayName || c.name || c.id,
           })),
         }),
       };
     }
 
-    // ── Create posts ─────────────────────────────────────────────────────────
+    // ── Create posts ──────────────────────────────────────────────────────────
     if (body.action === "publish") {
       const { profileIds, platforms } = body;
       const results = {};
 
       const createPost = async (channelId, text) => {
-        const CREATE = `
+        const data = await gql(TOKEN, `
           mutation CreatePost($channelId: String!, $text: String!) {
             createPost(input: {
               channelId: $channelId,
@@ -76,8 +89,8 @@ exports.handler = async (event) => {
               ... on PostActionSuccess { post { id } }
               ... on MutationError { message }
             }
-          }`;
-        const data = await gql(TOKEN, CREATE, { channelId, text });
+          }
+        `, { channelId, text });
         const result = data.createPost;
         if (result.message) throw new Error(result.message);
         return { success: true, id: result.post?.id };
