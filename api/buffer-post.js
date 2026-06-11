@@ -1,15 +1,12 @@
 // Printarelle Content Engine — Buffer GraphQL API (Vercel Function)
-// Requires: BUFFER_TOKEN in Vercel environment variables (Personal Key from Buffer Settings → API)
+// Requires: BUFFER_TOKEN in Vercel environment variables
 
 const API = "https://api.buffer.com";
 
 const gql = async (token, query, variables = {}) => {
   const res = await fetch(API, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token,
-    },
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
     body: JSON.stringify({ query, variables }),
   });
   const data = await res.json();
@@ -20,7 +17,6 @@ const gql = async (token, query, variables = {}) => {
 module.exports = async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -42,17 +38,13 @@ module.exports = async (req, res) => {
       const chData = await gql(TOKEN, `
         query GetChannels($orgId: OrganizationId!) {
           channels(input: { organizationId: $orgId }) {
-            id
-            name
-            displayName
-            service
+            id name displayName service
           }
         }
       `, { orgId });
 
-      const channels = chData.channels || [];
       return res.status(200).json({
-        profiles: channels.map(c => ({
+        profiles: (chData.channels || []).map(c => ({
           id: c.id,
           service: c.service || "unknown",
           username: c.displayName || c.name || c.id,
@@ -62,23 +54,35 @@ module.exports = async (req, res) => {
 
     // ── Publish ───────────────────────────────────────────────────────────────
     if (body.action === "publish") {
-      const { profileIds, platforms } = body;
+      const { profileIds, platforms, imageUrl } = body;
       const results = {};
 
       const createPost = async (channelId, text) => {
-        const data = await gql(TOKEN, `
-          mutation CreatePost($channelId: ChannelId!, $text: String!) {
+        // Use image mutation if imageUrl provided, text-only otherwise
+        const mutation = imageUrl ? `
+          mutation CreatePost($channelId: ChannelId!, $text: String!, $imageUrl: String!) {
             createPost(input: {
-              channelId: $channelId,
-              text: $text,
-              schedulingType: automatic,
-              mode: addToQueue
+              channelId: $channelId, text: $text,
+              schedulingType: automatic, mode: addToQueue,
+              assets: [{ image: { url: $imageUrl } }]
             }) {
               ... on PostActionSuccess { post { id } }
               ... on MutationError { message }
             }
           }
-        `, { channelId, text });
+        ` : `
+          mutation CreatePost($channelId: ChannelId!, $text: String!) {
+            createPost(input: {
+              channelId: $channelId, text: $text,
+              schedulingType: automatic, mode: addToQueue
+            }) {
+              ... on PostActionSuccess { post { id } }
+              ... on MutationError { message }
+            }
+          }
+        `;
+        const vars = imageUrl ? { channelId, text, imageUrl } : { channelId, text };
+        const data = await gql(TOKEN, mutation, vars);
         const result = data.createPost;
         if (result.message) throw new Error(result.message);
         return { success: true, id: result.post?.id };
@@ -88,12 +92,10 @@ module.exports = async (req, res) => {
         try { results.instagram = await createPost(profileIds.instagram, platforms.instagram.caption); }
         catch(e) { results.instagram = { error: e.message }; }
       }
-
       if (platforms?.facebook && profileIds?.facebook) {
         try { results.facebook = await createPost(profileIds.facebook, platforms.facebook.caption); }
         catch(e) { results.facebook = { error: e.message }; }
       }
-
       if (platforms?.pinterest?.pins && profileIds?.pinterest) {
         results.pinterest = [];
         for (const pin of platforms.pinterest.pins) {
@@ -107,7 +109,6 @@ module.exports = async (req, res) => {
     }
 
     return res.status(400).json({ error: "Unknown action: " + body.action });
-
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
