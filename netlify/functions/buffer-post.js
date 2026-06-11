@@ -48,7 +48,7 @@ exports.handler = async (event) => {
 
       // Step 2: get channels for that org
       const chData = await gql(TOKEN, `
-        query GetChannels($orgId: String!) {
+        query GetChannels($orgId: OrganizationId!) {
           channels(input: { organizationId: $orgId }) {
             id
             name
