@@ -75,7 +75,7 @@ footer{text-align:center;font-size:11px;color:var(--inksoft);font-style:italic;m
     <div class="secthead">Shopify store domain</div>
     <div class="hint">Your myshopify.com domain. Find it in Shopify admin — it's in the browser URL as admin.shopify.com/store/YOUR-STORE or check Settings → Domains.</div>
     <input id="shopDomainInput" placeholder="your-store.myshopify.com">
-    <button class="btn3" style="margin-bottom:8px" onclick="saveSettings();localStorage.removeItem('pce_products_'+getShop());loadAllProducts()">Save &amp; reload products</button>
+    <button class="btn3" style="margin-bottom:8px" onclick="saveSettings();refreshProducts()">Save &amp; reload products</button>
     <div class="secthead">Buffer publishing (optional)</div>
     <div class="hint">Get your Personal Key: <b>Buffer → Settings → API → Personal Keys → + New Key</b>. Name it anything, set expiry to 1 year. Copy the key and add it to Netlify → Site settings → Environment variables as <b>BUFFER_TOKEN</b>. Then tap Load channels below.</div>
     <button class="btn3" id="loadChBtn" onclick="loadBufferChannels()" style="margin-bottom:8px">Load my Buffer channels</button>
@@ -89,6 +89,7 @@ footer{text-align:center;font-size:11px;color:var(--inksoft);font-style:italic;m
   <div style="display:flex;gap:8px;margin-bottom:8px">
     <input id="shopQuery" placeholder="Type a product name, e.g. scratch card" style="flex:1;margin:0">
     <button class="btn2" onclick="searchProducts()" style="border-radius:12px;white-space:nowrap;flex-shrink:0">Search</button>
+    <button class="btn2" onclick="refreshProducts()" id="refreshBtn" style="border-radius:12px;white-space:nowrap;flex-shrink:0;background:var(--sage)" title="Refresh product list from Shopify">🔄</button>
   </div>
   <div class="hint" id="shopHint"></div>
   <div id="shopResults"></div>
@@ -396,14 +397,21 @@ function renderPublishBuffer(){
     card.innerHTML=`<h2>3 · Publish</h2>
       <div class="hint">Queues ${mapped} in Buffer. Instagram requires an image.</div>
       <div class="secthead">Post image</div>
-      ${hasShopImg
-        ? `<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
-            <img src="${selectedProduct.image}" style="width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--line)">
-            <div class="hint" style="margin:0">Using your Shopify product image. Or paste a different public URL below.</div>
-           </div>`
-        : `<div class="hint">No product image found. Paste a public image URL to include one.</div>`
-      }
-      <input id="pubImageUrl" type="url" placeholder="https://yourimage.com/photo.jpg" value="${hasShopImg?selectedProduct.image:''}" style="margin-bottom:10px">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap">
+        <div id="pubImgPreviewWrap" style="${hasShopImg?'display:flex':'display:none'};align-items:center;gap:8px">
+          <img id="pubImgPreview" src="${hasShopImg?selectedProduct.image:''}" style="width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--line)">
+          <button class="chip" onclick="clearPubImage()" style="font-size:11px;padding:5px 10px">Remove</button>
+        </div>
+        <div style="flex:1;min-width:180px">
+          <label class="btn3" style="display:inline-block;cursor:pointer;margin-bottom:6px;text-align:center;width:auto;padding:10px 18px">
+            📁 Upload image from device
+            <input type="file" id="pubImgFile" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+          </label>
+          <div class="hint" style="margin:0">Or paste a public image URL:</div>
+          <input id="pubImageUrl" type="url" placeholder="https://yourimage.com/photo.jpg" value="${hasShopImg?selectedProduct.image:''}" style="margin-top:4px">
+          <div id="uploadStatus" style="font-size:12px;color:var(--sage);display:none;margin-top:4px"></div>
+        </div>
+      </div>
       <button class="btn3" id="bufferBtn" onclick="publishToBuffer()">🚀 Publish to Buffer</button>
       <div id="bufferStatus" style="display:none;margin-top:10px"></div>`;
   }else{
@@ -413,12 +421,73 @@ function renderPublishBuffer(){
   w.appendChild(card);
 }
 
+function clearPubImage(){
+  document.getElementById("pubImageUrl").value="";
+  document.getElementById("pubImgPreview").src="";
+  document.getElementById("pubImgPreviewWrap").style.display="none";
+}
+
+async function handleImageUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  const status = document.getElementById("uploadStatus");
+  status.textContent="Uploading..."; status.style.display="block"; status.style.color="var(--inksoft)";
+
+  // Resize image in browser before uploading
+  const base64 = await new Promise((resolve)=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const max = 1200;
+      const scale = Math.min(1, max/Math.max(img.width, img.height));
+      const cv = document.createElement("canvas");
+      cv.width = Math.round(img.width*scale);
+      cv.height = Math.round(img.height*scale);
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      resolve(cv.toDataURL("image/jpeg", 0.9));
+    };
+    img.src = URL.createObjectURL(file);
+  });
+
+  try{
+    const res = await fetch("/api/upload-image",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ image: base64 })
+    });
+    const data = await res.json();
+    if(!res.ok||data.error) throw new Error(data.error||"Upload failed");
+
+    // Show preview and fill URL
+    document.getElementById("pubImageUrl").value = data.url;
+    const preview = document.getElementById("pubImgPreview");
+    const previewWrap = document.getElementById("pubImgPreviewWrap");
+    preview.src = data.url;
+    previewWrap.style.display="flex";
+    status.textContent="✓ Uploaded successfully";
+    status.style.color="var(--sage)";
+  }catch(e){
+    status.textContent="❌ "+e.message;
+    status.style.color="var(--rose)";
+  }
+}
+
 // ============ SHOPIFY PRODUCT SEARCH (no token needed) ============
 let allProducts = [];
 let selectedProduct = null;
 
 function getShop(){
   return localStorage.getItem("pce_shop_domain") || "rpmffu-te.myshopify.com";
+}
+
+function refreshProducts(){
+  // Clear ALL product cache keys regardless of domain
+  Object.keys(localStorage)
+    .filter(k => k.startsWith("pce_products"))
+    .forEach(k => localStorage.removeItem(k));
+  allProducts = [];
+  document.getElementById("shopResults").innerHTML = "";
+  clearProduct();
+  loadAllProducts();
 }
 
 async function loadAllProducts(){
