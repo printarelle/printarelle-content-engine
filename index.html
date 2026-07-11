@@ -3,930 +3,765 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Printarelle Content Engine</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<title>Printarelle Content Brain</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --cream:#FAF6EE; --card:#FFFDF8; --gold:#B8892E; --goldsoft:#E7D3A4;
-  --rose:#C2707C; --sage:#7E9B7D; --ink:#2E2A23; --inksoft:#6B6354; --line:#E9E0CC;
+  --cream:#FAF6EE; --cream2:#F3EBDD; --card:#FFFDF8; --gold:#B4863C; --gold-lt:#D9BC7F;
+  --gold-pale:#EFE2C6; --pink:#E5AFB4; --pink-deep:#C77F86; --sage:#7E9B7D; --sage-pale:#E4EDE3;
+  --ink:#3B3127; --ink-soft:#6E6154; --line:#E9E0CC; --ok:#5E7D4F; --err:#8A3D49; --err-bg:#F6E1E4;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Lora',Georgia,serif;background:var(--cream);color:var(--ink);padding:28px 14px 60px;max-width:760px;margin:0 auto}
-.pf{font-family:'Playfair Display',Georgia,serif}
-header{text-align:center;margin-bottom:28px}
-.eyebrow{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
-h1{font-family:'Playfair Display',serif;font-size:clamp(28px,6vw,42px);font-weight:700}
-.divider{width:64px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:14px auto 10px}
-.sub{font-size:13px;color:var(--inksoft);font-style:italic}
-.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:18px}
-.card h2{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:10px}
-.hint{font-size:11px;color:var(--inksoft);margin-bottom:8px}
-input,textarea{font-family:'Lora',serif;width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--cream);font-size:14px;outline:none;margin-bottom:8px}
-input:focus,textarea:focus{border-color:var(--gold)}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.chip{font-family:'Lora',serif;font-size:13px;padding:8px 14px;border-radius:20px;border:1.5px solid var(--line);background:var(--cream);color:var(--inksoft);cursor:pointer;transition:all .15s}
-.chip.on{background:#F4ECD8;border-color:var(--gold);color:var(--ink)}
-.chip.dark.on{background:var(--ink);border-color:var(--ink);color:var(--cream)}
-.btn{font-family:'Playfair Display',serif;width:100%;padding:13px;border:none;border-radius:12px;background:var(--gold);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
-.btn:disabled{background:var(--goldsoft);color:var(--ink)}
-.btn2{font-family:'Lora',serif;padding:9px 18px;border:none;border-radius:20px;background:var(--gold);color:#fff;font-size:13px;font-weight:500;cursor:pointer}
-.btn2.ok{background:var(--sage)}
-.btn3{font-family:'Lora',serif;width:100%;padding:12px;border:none;border-radius:12px;background:var(--ink);color:var(--cream);font-size:14px;cursor:pointer;margin-top:6px}
-.error{background:#F6E1E4;color:#8A3D49;border-radius:12px;padding:13px;font-size:13px;margin-bottom:16px}
-.platcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
-.platcard.gold{border:1.5px solid var(--goldsoft)}
-.plathead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.plathead .t{font-family:'Playfair Display',serif;font-size:16px;font-weight:700}
-.captionbox{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:13px;font-size:13.5px;line-height:1.75;white-space:pre-wrap;margin-bottom:10px}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.tag{font-size:11px;padding:4px 11px;border-radius:20px}
-.note{font-size:12px;color:var(--inksoft);margin-top:6px;line-height:1.6}
-.box{border-radius:12px;padding:10px 13px;font-size:13px;margin-bottom:8px}
-.box.gold{background:#F4ECD8;border:1px solid var(--goldsoft)}
-.box.sage{background:#E4EDE3;border:1px solid #C8D8C7}
-.overlay{font-family:'Playfair Display',serif;font-style:italic;text-align:center;background:#F4ECD8;border-radius:12px;padding:12px;margin-bottom:10px}
-details{margin-bottom:18px}
-summary{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;cursor:pointer;padding:14px 18px;background:var(--card);border:1px solid var(--line);border-radius:18px}
-details[open] summary{border-radius:18px 18px 0 0}
-details .inner{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 18px 18px;padding:16px 18px}
+body{background:var(--cream);color:var(--ink);font-family:'Lora',Georgia,serif;font-size:16px;line-height:1.55;padding-bottom:92px}
+h1,h2,h3,.serif{font-family:'Playfair Display',Georgia,serif}
+header{background:var(--card);border-bottom:2px solid var(--gold-pale);padding:18px 16px 14px;text-align:center}
+header h1{font-size:1.5rem;letter-spacing:.04em}
+header h1 span{color:var(--gold)}
+header p{font-size:.74rem;color:var(--ink-soft);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
+.foil-rule{height:3px;background:linear-gradient(90deg,var(--gold-pale),var(--gold),var(--gold-lt),var(--gold),var(--gold-pale));margin:10px auto 0;max-width:220px;border-radius:2px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--gold-pale);display:flex;z-index:50;box-shadow:0 -4px 18px rgba(59,49,39,.08)}
+nav button{flex:1;background:none;border:none;padding:10px 1px 12px;font-family:'Lora',serif;font-size:.62rem;color:var(--ink-soft);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button .ic{font-size:1.15rem;line-height:1}
+nav button.active{color:var(--gold)}
+main{max-width:740px;margin:0 auto;padding:18px 14px 30px}
+section{display:none}
+section.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(59,49,39,.05)}
+.card h2{font-size:1.15rem;margin-bottom:8px}
+label{display:block;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin:12px 0 5px}
+select,input[type=text],input[type=password],textarea{width:100%;padding:11px 12px;border:1.5px solid var(--gold-pale);border-radius:10px;background:var(--cream);font-family:'Lora',serif;font-size:.95rem;color:var(--ink)}
+select:focus,input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+textarea{min-height:64px;resize:vertical}
+.btn{display:inline-block;background:var(--gold);color:#fff;border:none;border-radius:999px;padding:12px 24px;font-family:'Playfair Display',serif;font-size:1rem;cursor:pointer;margin-top:12px}
+.btn:disabled{background:var(--gold-lt);cursor:wait}
+.btn.pink{background:var(--pink-deep)}
+.btn.sage{background:var(--sage)}
+.btn.ghost{background:none;border:1.5px solid var(--gold);color:var(--gold);padding:10px 20px;font-size:.9rem}
+.btn.small{padding:7px 14px;font-size:.82rem;margin-top:8px}
+.btn.wide{width:100%;text-align:center}
+.chiprow{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.chip{border:1.5px solid var(--gold-pale);background:var(--card);border-radius:999px;padding:7px 13px;font-size:.85rem;cursor:pointer;color:var(--ink-soft);font-family:'Lora',serif}
+.chip.on{background:var(--gold);border-color:var(--gold);color:#fff}
+.chip.pinkon{background:var(--pink-deep);border-color:var(--pink-deep);color:#fff}
+.hint{font-size:.8rem;color:var(--ink-soft);font-style:italic;margin-top:6px;line-height:1.5}
+.error{background:var(--err-bg);color:var(--err);border-radius:12px;padding:13px;font-size:.86rem;margin:10px 0;line-height:1.5}
+.copybtn{background:var(--cream2);border:1px solid var(--gold-lt);color:var(--gold);border-radius:8px;padding:5px 12px;font-size:.78rem;cursor:pointer;font-family:'Lora',serif;margin-top:8px;margin-right:6px}
+.copybtn.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.out{white-space:pre-wrap;background:var(--cream2);border-radius:10px;padding:13px;font-size:.92rem;margin-top:8px;border:1px dashed var(--gold-lt);line-height:1.7}
+.tagrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:.72rem;padding:4px 11px;border-radius:20px;background:var(--gold-pale)}
+.tag.pk{background:var(--pink);color:#fff}
+.plat-head{font-family:'Playfair Display',serif;font-size:1rem;padding:6px 12px;border-radius:8px;color:#fff;display:inline-block;margin-bottom:8px}
+.p-ig{background:#C2608E}.p-tt{background:#2E2A26}.p-fb{background:#4A6D9C}.p-yt{background:#B04A3E}.p-pin{background:#8E3A42}
+.subhead{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:12px 0 4px;font-weight:600}
+.thinkcard{border-left:5px solid var(--gold);background:linear-gradient(180deg,#FFFDF8,#FAF4E6)}
+.thinkrow{display:flex;gap:10px;margin-top:10px;font-size:.9rem;line-height:1.6}
+.thinkrow .ic{flex-shrink:0}
+.checkline{display:flex;align-items:center;gap:7px;font-size:.82rem;margin-top:5px}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:var(--ok)} .dot.bad{background:var(--err)}
+.prodrow{display:flex;gap:10px;align-items:center;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px;cursor:pointer}
+.prodrow:hover{border-color:var(--gold)}
+.prodrow img{width:48px;height:48px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--cream2)}
+.prodrow .t{font-size:.9rem;font-weight:600}
+.prodrow .d{font-size:.76rem;color:var(--ink-soft)}
+.selprod{border:1.5px solid var(--gold-lt) !important;background:#FBF3DF !important}
+details.settings summary{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;cursor:pointer;padding:13px 16px;background:var(--card);border:1px solid var(--line);border-radius:16px;list-style:none}
+details.settings[open] summary{border-radius:16px 16px 0 0}
+details.settings .inner{background:var(--card);border:1px solid var(--line);border-top:none;border-radius:0 0 16px 16px;padding:14px 16px;margin-bottom:14px}
+details.settings{margin-bottom:14px}
+.calslot{border:1px dashed var(--gold-lt);border-radius:10px;padding:10px;margin-top:8px;background:var(--cream)}
+.calitem{background:var(--card);border:1px solid var(--gold-pale);border-radius:9px;padding:9px 30px 9px 11px;margin-top:7px;font-size:.88rem;position:relative}
+.calitem .del{position:absolute;top:6px;right:8px;border:none;background:none;color:var(--pink-deep);font-size:1rem;cursor:pointer}
+.daytabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:6px}
+.daytabs .chip{flex:0 0 auto}
+.cheat h3{font-size:1.02rem;margin-bottom:4px}
+.cheat ul{padding-left:18px;font-size:.9rem}
+.cheat li{margin-bottom:5px}
 .hist{display:flex;flex-wrap:wrap;gap:8px}
-.hist button{font-family:'Lora',serif;font-size:12px;padding:8px 13px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--inksoft);cursor:pointer}
-.secthead{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin:14px 0 8px}
-footer{text-align:center;font-size:11px;color:var(--inksoft);font-style:italic;margin-top:30px}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
-.ok-dot{background:var(--sage)} .no-dot{background:var(--rose)}
+.hist button{font-family:'Lora',serif;font-size:.78rem;padding:8px 13px;border-radius:20px;border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--cream);padding:9px 18px;border-radius:999px;font-size:.85rem;opacity:0;transition:.3s;pointer-events:none;z-index:99}
+.toast.show{opacity:1}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(min-width:700px){nav{position:sticky;top:0;bottom:auto;border-bottom:1px solid var(--gold-pale);border-top:none}body{padding-bottom:20px}}
+@media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="eyebrow">Printarelle</div>
-  <h1 class="pf">Content Engine</h1>
-  <div class="divider"></div>
-  <div class="sub">Self-hosted edition · runs on your own API key · publishes via Publer</div>
+  <h1>Printarelle <span>Content Brain</span></h1>
+  <p>Thinks first, writes second &middot; Skill v3.0.0 &middot; 2026</p>
+  <div class="foil-rule"></div>
 </header>
+<main>
 
-<details id="settings">
-  <summary>⚙️ Settings <span id="setStatus" style="font-size:12px;font-weight:400"></span></summary>
+<!-- ================= TAB: CREATE ================= -->
+<section id="tab-create" class="active">
+
+<details class="settings" id="settingsBox">
+  <summary>&#9881;&#65039; Settings <span id="setStatus" style="font-size:.75rem;font-weight:400;color:var(--ink-soft)"></span></summary>
   <div class="inner">
-    <div class="secthead">Anthropic (required)</div>
-    <div class="hint">Create a key named "content-engine" at console.anthropic.com → API Keys.</div>
+    <div class="subhead">Anthropic API key (required)</div>
+    <div class="hint">Create a key at console.anthropic.com, API Keys. Stored only in this browser.</div>
     <input id="apiKey" type="password" placeholder="sk-ant-...">
-    <div class="secthead">Shopify store domain</div>
-    <div class="hint">Your myshopify.com domain. Find it in Shopify admin — it's in the browser URL as admin.shopify.com/store/YOUR-STORE or check Settings → Domains.</div>
-    <input id="shopDomainInput" placeholder="your-store.myshopify.com">
-    <button class="btn3" style="margin-bottom:8px" onclick="saveSettings();refreshProducts()">Save &amp; reload products</button>
-    <div class="secthead">Buffer publishing (optional)</div>
-    <div class="hint">Get your Personal Key: <b>Buffer → Settings → API → Personal Keys → + New Key</b>. Name it anything, set expiry to 1 year. Copy the key and add it to Netlify → Site settings → Environment variables as <b>BUFFER_TOKEN</b>. Then tap Load channels below.</div>
-    <button class="btn3" id="loadChBtn" onclick="loadBufferChannels()" style="margin-bottom:8px">Load my Buffer channels</button>
-    <div id="bufferChannels"></div>
-    <button class="btn3" onclick="saveSettings()">Save all settings</button>
+    <div class="subhead">Brain quality</div>
+    <div class="chiprow" id="modelChips"></div>
+    <div class="hint">Best thinks harder and writes better. Fast is cheaper per pack.</div>
+    <div class="subhead">Shopify store domain</div>
+    <div class="hint">Your myshopify.com domain, found in Shopify admin under Settings, Domains.</div>
+    <input id="shopDomain" type="text" placeholder="your-store.myshopify.com">
+    <button class="btn small ghost" onclick="saveSettings();loadProducts(true)">Save and load products</button>
   </div>
 </details>
 
 <div class="card">
-  <h2>1 · Find your product</h2>
-  <div style="display:flex;gap:8px;margin-bottom:8px">
-    <input id="shopQuery" placeholder="Type a product name, e.g. scratch card" style="flex:1;margin:0">
-    <button class="btn2" onclick="searchProducts()" style="border-radius:12px;white-space:nowrap;flex-shrink:0">Search</button>
-    <button class="btn2" onclick="refreshProducts()" id="refreshBtn" style="border-radius:12px;white-space:nowrap;flex-shrink:0;background:var(--sage)" title="Refresh product list from Shopify">🔄</button>
+  <h2>1 &middot; Pick the product</h2>
+  <div style="display:flex;gap:8px">
+    <input type="text" id="prodQuery" placeholder="Search your Shopify products" style="flex:1" oninput="filterProducts()">
+    <button class="btn small sage" style="margin:0;flex-shrink:0;border-radius:10px" onclick="loadProducts(true)" title="Refresh from Shopify">&#128260;</button>
   </div>
-  <div class="hint" id="shopHint"></div>
-  <div id="shopResults"></div>
-
-  <div id="selectedProduct" style="display:none;margin-top:12px">
-    <div style="display:flex;gap:12px;align-items:center;background:var(--cream);border:1.5px solid var(--goldsoft);border-radius:14px;padding:12px">
-      <img id="selImg" style="width:60px;height:60px;border-radius:10px;object-fit:cover;flex-shrink:0;display:none">
-      <div style="flex:1;min-width:0">
-        <div id="selTitle" style="font-family:'Playfair Display',serif;font-weight:700;font-size:15px;margin-bottom:3px"></div>
-        <div id="selDesc" style="font-size:12px;color:var(--inksoft);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical"></div>
-      </div>
-      <button class="chip" onclick="clearProduct()" style="flex-shrink:0;font-size:11px;padding:6px 10px">Change</button>
-    </div>
-  </div>
-
-  <h2 style="margin-top:18px">2 · The brief</h2>
-  <div class="chips" id="goalChips"></div>
-  <input id="occasion" placeholder="Occasion (e.g. Father's Day, Communion, birthday)">
-  <div class="secthead">Platforms</div>
-  <div class="chips" id="platChips"></div>
-  <div class="secthead">Emotional infographic (optional)</div>
-  <div class="chips" id="styleChips"></div>
-  <div id="stylePreview" style="display:none;margin-bottom:12px">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
-      <div>
-        <div class="hint" id="previewLabel" style="margin-bottom:6px;font-weight:600;color:var(--ink)"></div>
-        <div class="hint" id="previewDesc" style="margin-bottom:8px"></div>
-        <div class="chips" id="sizeChips" style="margin:0"></div>
-      </div>
-      <div id="previewSvgWrap" style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--cream)"></div>
-    </div>
-  </div>
-  <button class="btn" id="genBtn" onclick="generatePack()">Generate content pack</button>
+  <div class="hint" id="prodHint">Add your store domain in Settings, then load products.</div>
+  <div id="prodResults"></div>
+  <label style="margin-top:14px">Or type it manually</label>
+  <input type="text" id="manualProduct" placeholder="e.g. Gold Foil Wedding Scratch Reveal Ticket">
+  <input type="text" id="manualDetail" placeholder="One detail worth mentioning (optional)" style="margin-top:8px">
 </div>
 
-<div id="errorBox" class="error" style="display:none"></div>
-<div id="results"></div>
-<div id="publishWrap"></div>
+<div class="card">
+  <h2>2 &middot; The brief</h2>
+  <label>Goal</label><div class="chiprow" id="goalChips"></div>
+  <label>Occasion</label>
+  <div class="chiprow" id="occChips"></div>
+  <input type="text" id="occOther" placeholder="Or type any occasion, e.g. Debs, retirement" style="margin-top:8px">
+  <label>Platforms</label><div class="chiprow" id="platChips"></div>
+  <label>Anything else the brain should know? (optional)</label>
+  <textarea id="briefExtra" placeholder="e.g. launching Friday, I have a scratch reveal video already filmed"></textarea>
+  <button class="btn wide" id="thinkBtn" onclick="runStrategy()">Think first</button>
+</div>
+
+<div id="errorBox"></div>
+<div id="strategyBox"></div>
+<div id="packBox"></div>
 
 <div class="card" id="histCard" style="display:none">
   <h2>Recent packs</h2>
   <div class="hist" id="histList"></div>
 </div>
+</section>
 
-<footer>Made for Printarelle · Mallow, Co. Cork, Ireland · www.printarelle.com</footer>
+<!-- ================= TAB: PLANNER ================= -->
+<section id="tab-cal">
+  <h2 class="serif" style="font-size:1.35rem;margin-bottom:4px">Weekly Planner</h2>
+  <p class="hint" style="margin-bottom:12px">Facebook rule is built in: across the week use one photo post, one photo or carousel, one Reel. Never all Reels.</p>
+  <div class="daytabs" id="dayTabs"></div>
+  <div class="card">
+    <label>Add a post to <span id="calDayLabel" class="serif">Monday</span></label>
+    <div class="chiprow" id="calPlatform"></div>
+    <input type="text" id="calText" placeholder="e.g. Reel: scratch reveal of wedding ticket" style="margin-top:10px">
+    <button class="btn small" onclick="addCal()">Add post</button>
+  </div>
+  <div id="calList"></div>
+  <div class="card">
+    <button class="copybtn" onclick="exportCal()">Export my plan</button>
+    <button class="copybtn" onclick="document.getElementById('impFile').click()">Import a plan</button>
+    <input type="file" id="impFile" style="display:none" accept=".json" onchange="importCal(event)">
+    <p class="hint">Export before updating this file, then import into the new version.</p>
+  </div>
+</section>
+
+<!-- ================= TAB: HOOKS ================= -->
+<section id="tab-hooks">
+  <h2 class="serif" style="font-size:1.35rem;margin-bottom:4px">Hook Bank</h2>
+  <p class="hint" style="margin-bottom:12px">First lines and first-frame text. Half of viewers watch on mute, the hook must work silently.</p>
+  <div class="card">
+    <label>Filter by product</label><div class="chiprow" id="hookProduct"></div>
+    <label>Filter by style</label><div class="chiprow" id="hookStyle"></div>
+    <label>Generate fresh hooks with AI</label>
+    <select id="hookShopProd"></select>
+    <button class="btn small pink" id="hookGenBtn" onclick="genHooks()">Generate 5 new hooks</button>
+    <p class="hint">Uses your API key. New hooks match the filters above, are written for the chosen Shopify product, and are saved into your bank.</p>
+  </div>
+  <div id="hookResults"></div>
+</section>
+
+<!-- ================= TAB: RULES ================= -->
+<section id="tab-cheat">
+  <h2 class="serif" style="font-size:1.35rem;margin-bottom:4px">2026 Rules</h2>
+  <p class="hint" style="margin-bottom:12px">The caps and signals the brain follows. Researched July 2026, refresh every 2 to 3 months.</p>
+  <div id="cheatBody"></div>
+</section>
+</main>
+
+<nav>
+  <button class="active" data-tab="tab-create"><span class="ic">&#10022;</span>Create</button>
+  <button data-tab="tab-cal"><span class="ic">&#9633;</span>Planner</button>
+  <button data-tab="tab-hooks"><span class="ic">&#9733;</span>Hooks</button>
+  <button data-tab="tab-cheat"><span class="ic">&#9670;</span>Rules</button>
+</nav>
+<div class="toast" id="toast"></div>
 
 <script>
-// ============ CONFIG ============
-const MODEL = "claude-haiku-4-5-20251001";
-
+/* ==================== CONFIG & 2026 KNOWLEDGE ==================== */
+const MODELS = {fast:"claude-haiku-4-5-20251001", best:"claude-sonnet-4-6"};
 const PLATFORMS = [
-  {id:"instagram", name:"Instagram", emoji:"📸", def:true},
-  {id:"tiktok", name:"TikTok", emoji:"🎵", def:true},
-  {id:"facebook", name:"Facebook", emoji:"📘", def:true},
-  {id:"youtube", name:"YouTube Shorts", emoji:"▶️", def:true},
-  {id:"pinterest", name:"Pinterest", emoji:"📌", def:false},
+  {id:"instagram", name:"Instagram", cls:"p-ig", def:true},
+  {id:"tiktok", name:"TikTok", cls:"p-tt", def:true},
+  {id:"facebook", name:"Facebook", cls:"p-fb", def:true},
+  {id:"youtube", name:"YouTube Shorts", cls:"p-yt", def:true},
+  {id:"pinterest", name:"Pinterest", cls:"p-pin", def:true},
+];
+const CAPS = {instagram:{min:3,max:5}, tiktok:{min:3,max:5}, facebook:{min:1,max:3}, youtube:{min:3,max:5}, pinterest:{min:10,max:15}};
+const GOALS = ["Awareness","Engagement","Sales"];
+const OCCS = ["Wedding","Birthday","Communion","Christening","New baby","Anniversary","Christmas","Mother's Day","Father's Day","Irish language","None"];
+
+const FORMATS = [
+ {n:"Pack an order with me",d:"Hands packing a real order start to finish, thank-you note and personal touches, ASMR paper sounds with original audio",p:["tiktok","instagram","youtube","facebook"]},
+ {n:"The reveal",d:"Finished product hidden or face down, flip or scratch to reveal at second 2, loop the ending back to the start",p:["tiktok","instagram","youtube"]},
+ {n:"Making of, sped up",d:"Time-lapse of foil press or topper assembly, 3 to 5 word overlays per stage, end on the piece held to camera",p:["tiktok","instagram","youtube","facebook"]},
+ {n:"Before you buy",d:"Series answering one real customer question per episode: sizing, icing sheets, turnaround, personalisation",p:["tiktok","youtube","facebook"]},
+ {n:"Carousel: 5 ways to use it",d:"Product in 5 real settings, carousels are the top static format and get re-shown to non-finishers, CTA on last slide",p:["instagram","facebook"]},
+ {n:"The occasion answer",d:"Answer a real search question directly, keyword in the first line and the on-screen text",p:["pinterest","instagram","tiktok","youtube"]},
+ {n:"Reaction to the order note",d:"A lovely or funny personalisation request, name blurred, then make it",p:["tiktok","instagram","facebook"]},
+ {n:"Foil in the light",d:"Slow macro tilt so the foil catches light, 7 to 12 seconds, loopable, high completion",p:["tiktok","instagram","youtube"]},
+ {n:"Styled flat lay pin",d:"1000x1500 vertical, product front and centre on cream, one short overlay naming the occasion",p:["pinterest"]},
+ {n:"Idea list pin",d:"Vertical graphic list, planning content drives saves and saves are the top Pinterest signal",p:["pinterest"]},
+ {n:"Behind the studio day",d:"Day in the life in Mallow: orders in, foil pressing, post office run, founder-led beats polished",p:["tiktok","instagram","facebook","youtube"]},
+ {n:"This or that",d:"Two designs side by side, ask which they would pick, reply to comments within 24 hours",p:["instagram","facebook","tiktok"]},
+ {n:"Customer moment retell",d:"The story of one order: who, the occasion, the reaction, emotion drives shares",p:["instagram","facebook","tiktok"]},
+ {n:"Gift guide mini",d:"Three products for one person type: for the bride, for the Gaeilgeoir, for the new mam, built to be saved",p:["instagram","pinterest","facebook"]},
+ {n:"Myth or mistake",d:"One thing people get wrong: edible toppers, deadlines, card sizing, educational and save-worthy",p:["tiktok","instagram","youtube"]}
 ];
 
 const RULES = {
-  instagram:`INSTAGRAM REELS CAPTION. Publer limit: 2,200 chars. Aim for 150-300 chars for feed discovery. Hook in first 2 lines (before "more" cutoff) — emotional, specific, searchable. Body: who it is for, the feeling it creates, the occasion. One CTA: "Save this for later" or "Comment LINK for the link". 3-5 hashtags at the very end: #Printarelle + niche + occasion + community. Also generate: altText (max 125 chars, descriptive of what is in the image, include product name and occasion, used for accessibility and Pinterest SEO — e.g. "Personalised Debs Night card showing dance shoes illustration, handmade in Cork Ireland by Printarelle").`,
-  tiktok:`TIKTOK CAPTION. Publer limit: 2,200 chars. Keep it to 1-3 lines max — TikTok is audio-first. Format: "The most personal [occasion] gift — [product] that [benefit]. Perfect for [who]. Comment [WORD] for the link." 3-5 hashtags including one trending tag. Also generate: onScreenText (searchable phrase, max 8 words, first 2 seconds of video), spokenKeywords (3-5 phrases to say out loud early — TikTok's algorithm reads audio), altText (max 125 chars describing the video thumbnail or product image).`,
-  facebook:`FACEBOOK POST. Publer limit: 1,500 chars. One bold hook line (max 15 words) that stops the scroll. Body: 2-4 warm conversational sentences (50-150 words total) — who it is for, the feeling, the story. One CTA: "Comment GIFT for the link" or "Tag someone who deserves this". No links in the post body. 1-3 hashtags max at the end. Also generate: altText (max 125 chars describing the image for accessibility).`,
-  youtube:`YOUTUBE SHORTS. Video title: max 100 chars, keyword-rich, hooky (e.g. "Personalised Debs Night card — handmade in Cork"). Caption: 1-2 lines max, searchable. 2-3 hashtags inline. Also generate: altText (max 125 chars describing the thumbnail image).`,
-  pinterest:`PINTEREST — 3 PIN VARIATIONS. Natali uploads multiple images so she needs 3 separate pins. For EACH pin generate: title (max 100 chars, front-load keywords, e.g. "Personalised [Occasion] Card Ireland | Handmade by Printarelle"), description (max 230 chars — sweet spot for engagement — keyword-rich, written how a shopper searches, warm and specific, end with "Find it at printarelle.com"), altText (max 125 chars, descriptive of what is in the image, includes product name, occasion, and location). Keep each pin variation distinct in angle: Pin 1 focuses on the occasion/recipient, Pin 2 focuses on the personalisation/handmade aspect, Pin 3 focuses on the emotional moment or gifting story.`,
+instagram:`INSTAGRAM (skill v3.0.0). Caption 150-300 chars. Searchable keyword phrase in the FIRST line before story or flourish: captions are read by AI alongside visuals, not just scanned for hashtags. Shares and sends-per-reach (DM shares) now outrank likes; frame the post to be sent to someone or saved. For Reels the first 2-3 seconds decide it and watch completion is the primary ranking metric. Carousels are the highest-engagement static format. One CTA: Save this for later, or Comment LINK, or Send this to someone planning a wedding. Exactly 3-5 hashtags at the end, HARD CAP 5, caption and comments combined, extras get the post demoted. Include altText max 125 chars, human-readable, product plus occasion plus handmade in Ireland.`,
+tiktok:`TIKTOK (skill v3.0.0). Interest graph, follower count irrelevant; new videos test with 200-500 viewers first, completion bar is now roughly 70%. Signal order: watch time and completion, then rewatch or loop rate, then shares (worth about 3x likes), then saves, then meaningful comments. TikTok is a search engine: the keyword must appear in spoken audio, on-screen text, AND caption. Caption 1-3 lines max. 15-30 seconds is the safe default. Original audio rewarded. Loop the ending back to the start where the format allows. Comment WORD for the link style CTA. 3-5 hashtags. Include onScreenText, searchable phrase max 8 words for the first 2 seconds, spokenKeywords, 3-5 phrases to say out loud early, and altText max 125 chars.`,
+facebook:`FACEBOOK (skill v3.0.0). Meaningful social interaction ranks highest: comments and shares between people who know each other. Reels are the reach engine at roughly 5-10x a photo post and originality is fingerprint-checked, but the weekly mix must stay one photo post, one photo or carousel, one Reel. The 2026 User True Interest Survey rates whether a Reel genuinely matched interest, so no clickbait hooks that the content does not pay off. One bold hook line max 15 words, then 2-4 warm conversational sentences, 50-150 words. CTA that sparks conversation: Tag someone, or Comment GIFT. NO links in the post body, link goes in the first comment. 1-3 hashtags only. Reply within the first hour. Include altText max 125 chars, formatNote saying which slot this fills in the weekly mix, and firstComment with the shop link line.`,
+youtube:`YOUTUBE SHORTS (skill v3.0.0). Shorts rank on replay rate, click-through, like-to-view ratio, and share rate, not raw watch time. New Shorts get a roughly 48 hour freshness boost, so publish when the audience is awake. Title max 100 chars, keyword-rich and hooky, NEVER hashtags in the title. Caption 1-2 lines, searchable. 3-5 hashtags in the description and ALWAYS #Shorts as one of them, over about 15 total and YouTube ignores all of them. Include altText max 125 chars for the thumbnail.`,
+pinterest:`PINTEREST (skill v3.0.0), 3 PIN VARIATIONS. Visual search and planning engine, pins do not expire. Four signals: quality, engagement, relevance, freshness, and saves are the top signal. Pinterest AI reads the image itself including colours and materials, so note the cream and gold styling in the image note. New pins get a 24-48 hour test window; seasonal pins go up 6-8 weeks ahead. For each pin: title max 100 chars with keywords front-loaded, description around 400-500 chars where the FIRST 50-60 CHARACTERS carry the most weight, written how a shopper searches, warm and specific, ending with Find it at printarelle.com, altText max 125 chars naming product, occasion, and Ireland. Pin 1 angle: occasion and recipient. Pin 2: personalisation and handmade craft. Pin 3: the emotional moment or gifting story. Plus one shared hashtags list of 10-15 tags. Also suggest which board it belongs on, boards act as topic authority. Image: 1000x1500px, 2:3 portrait.`
 };
 
-const BRAND = `You write social content for Printarelle (printarelle.com), a handmade personalised gifts studio in Mallow, Co. Cork, Ireland. Brand voice: warm, personal, joyful, gift-focused, never corporate or pushy. Differentiators: hand-finished real foil prints, scratch reveal tickets, Irish language options, premium card stock. Use Irish English spelling (personalised, colour, mam where natural). NEVER use em dashes anywhere. Always include emotional connection plus one clear call to action. Never a wall of text.`;
+const SCRIPT_RULE = `VIDEO SCRIPT. Write exactly what Natali says to camera while filming, so she never rambles and every search keyword gets spoken out loud, because TikTok and Instagram read the audio. 15-30 seconds total. Rules: the hook is spoken in the first 2 seconds and contains the main search phrase. Repeat the product name and occasion naturally at least twice across the script. Short spoken sentences, how a real person talks, warm, no marketing voice. End with the spoken CTA matching the caption CTA. For each line give: time (e.g. 0-2s), say (the exact words), shot (what is on camera), and keyword true/false marking lines that carry a search keyword.`;
 
-const INFOG_STYLES = [
-{id:"s01",name:"Bold Two-Column",sub:"Style 01 · Flat & Playful",styleTag:"Bold",ratio:"4:5",
-base:`A vibrant, flat product listing infographic at {SIZE}. Bold playful design on a solid light background. Left column: chunky display headline in two lines about the emotional gift moment, then a vertical list of 5 feeling-based points — each with a small filled circle icon, an all-caps bold label, and a short one-line description (e.g. the gasp when they read their name, the card kept for years). Right column: the product resting naturally against a colours from the product image as if just opened, with a circular stamp badge reading "Handmade in Cork, Ireland". Bottom strip: two soft pill shapes. Footer row: 5 small icon + label pairs ending with www.printarelle.com. Typography: chunky rounded bold for headlines, clean geometric sans for body. Zero gradients, flat block-style. NEVER commercial: no prices, no quantity selectors, no CTA buttons. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f5f3ef"/><rect x="8" y="10" width="72" height="14" rx="3" fill="#999"/><rect x="8" y="27" width="58" height="9" rx="2" fill="#bbb"/><circle cx="14" cy="48" r="5" fill="#888"/><rect x="22" y="44" width="52" height="5" rx="1" fill="#ccc"/><rect x="22" y="51" width="42" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="66" r="5" fill="#aaa"/><rect x="22" y="62" width="52" height="5" rx="1" fill="#ccc"/><rect x="22" y="69" width="42" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="84" r="5" fill="#888"/><rect x="22" y="80" width="52" height="5" rx="1" fill="#ccc"/><rect x="22" y="87" width="42" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="102" r="5" fill="#aaa"/><rect x="22" y="98" width="52" height="5" rx="1" fill="#ccc"/><rect x="22" y="105" width="42" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="120" r="5" fill="#888"/><rect x="22" y="116" width="52" height="5" rx="1" fill="#ccc"/><rect x="22" y="123" width="42" height="3" rx="1" fill="#e0e0e0"/><rect x="95" y="70" width="90" height="115" rx="3" fill="#d4b98a"/><rect x="98" y="15" width="78" height="130" rx="4" fill="#d8d8d8" transform="rotate(-4 137 80)"/><circle cx="177" cy="20" r="13" fill="#999"/><circle cx="177" cy="20" r="10" fill="none" stroke="#fff" stroke-width="1.5"/><rect x="20" y="165" width="60" height="11" rx="5.5" fill="#bbb"/><rect x="90" y="165" width="60" height="11" rx="5.5" fill="#bbb"/><circle cx="18" cy="187" r="5" fill="#ccc"/><rect x="26" y="184" width="18" height="4" rx="1" fill="#ddd"/><circle cx="58" cy="187" r="5" fill="#ccc"/><rect x="66" y="184" width="18" height="4" rx="1" fill="#ddd"/><circle cx="98" cy="187" r="5" fill="#ccc"/><rect x="106" y="184" width="18" height="4" rx="1" fill="#ddd"/><circle cx="138" cy="187" r="5" fill="#ccc"/><rect x="146" y="184" width="18" height="4" rx="1" fill="#ddd"/><circle cx="175" cy="187" r="5" fill="#ccc"/></svg>`},
+const CAROUSEL_RULE = `CAROUSEL. Instagram's highest-engagement static format, also fills the Facebook photo or carousel slot. Build 4-6 slides that earn the swipe and the save. Slide 1 is the hook: keyword-led, max 8 words, must work as a standalone thumbnail. Middle slides deliver real value one idea at a time: uses, ideas, what to write, the story, the process. Last slide is the CTA slide: Save this for later, or the product name with printarelle.com. For each slide give: n (number), overlay (the on-screen text, max 8 words), support (one short supporting line under it, optional, can be empty), photo (exactly what to shoot or design for that slide, cream and gold styling). Also give concept, one sentence on what the carousel is, and saveReason, why someone saves this.`;
 
-{id:"s02",name:"Soft Feminine",sub:"Style 02 · Pastel & Feminine",styleTag:"Soft",ratio:"4:5",
-base:`A soft, feminine emotional infographic at {SIZE}. Two-section vertical layout with a clear tonal background break. Top section: light background, mixed-font headline (script + bold sans) carrying an emotional truth about small gifts and big feelings. 5 feeling rows each with a small circle icon, bold label, and one-line description. Right: a product card mockup tilted slightly over a colours from the product image. Bottom section: a distinctly toned pastel background, large centered script headline, short emotional paragraph, three circular badges holding single words like "kept", "treasured", "remembered". Footer strip: 4 small icon + label pairs. All corners softly rounded. Brand note: handcrafted with care by Printarelle, Mallow, Co. Cork, Ireland — www.printarelle.com. NEVER commercial: no prices, no CTA buttons, no sales language. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f5f3ef"/><rect x="0" y="0" width="200" height="148" fill="#f7f4f0"/><rect x="8" y="10" width="55" height="10" rx="3" fill="#bbb"/><rect x="8" y="23" width="80" height="14" rx="3" fill="#999"/><circle cx="14" cy="47" r="4" fill="#aaa"/><rect x="21" y="44" width="48" height="4" rx="1" fill="#ccc"/><rect x="21" y="50" width="40" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="62" r="4" fill="#bbb"/><rect x="21" y="59" width="48" height="4" rx="1" fill="#ccc"/><rect x="21" y="65" width="40" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="77" r="4" fill="#aaa"/><rect x="21" y="74" width="48" height="4" rx="1" fill="#ccc"/><rect x="21" y="80" width="40" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="92" r="4" fill="#bbb"/><rect x="21" y="89" width="48" height="4" rx="1" fill="#ccc"/><rect x="21" y="95" width="40" height="3" rx="1" fill="#e0e0e0"/><circle cx="14" cy="107" r="4" fill="#aaa"/><rect x="21" y="104" width="48" height="4" rx="1" fill="#ccc"/><rect x="21" y="110" width="40" height="3" rx="1" fill="#e0e0e0"/><rect x="88" y="55" width="102" height="82" rx="2" fill="#d4b98a"/><rect x="90" y="18" width="80" height="118" rx="3" fill="#d8d8d8" transform="rotate(-3 130 77)"/><rect x="0" y="148" width="200" height="108" fill="#ece8e2"/><rect x="30" y="156" width="140" height="12" rx="4" fill="#bbb"/><circle cx="55" cy="185" r="16" fill="#ccc"/><circle cx="100" cy="185" r="16" fill="#ccc"/><circle cx="145" cy="185" r="16" fill="#ccc"/><rect x="118" y="205" width="72" height="38" rx="4" fill="#ddd"/><rect x="0" y="243" width="200" height="13" fill="#d8d4ce"/><circle cx="30" cy="249" r="4" fill="#bbb"/><circle cx="80" cy="249" r="4" fill="#bbb"/><circle cx="130" cy="249" r="4" fill="#bbb"/><circle cx="178" cy="249" r="4" fill="#bbb"/></svg>`},
+const BRAND = `You write social content for Printarelle (printarelle.com), a handmade personalised stationery and gifts studio in Mallow, Co. Cork, Ireland. Skill v3.0.0, July 2026, governs everything you write. Products: hand-finished real gold foil greeting cards, personalised cake toppers, edible cupcake toppers, scratch-to-reveal surprise tickets, Irish language cards, stickers, wall prints, invitations. Voice: warm, personal, joyful, gift-focused, never corporate or pushy. HARD RULES, never break: 1. No em dashes or en dashes, ever, use a comma, a colon, or a full stop. 2. Irish/UK spelling throughout, personalised never personalized. 3. Handmade in Ireland positioning; Cork is provenance only, never the primary keyword. 4. Keyword-first captions, the first line states the topic in words a customer would search, before story or flourish. 5. Native content per platform, never reference watermarks or cross-posting. Universal 2026 principles: search-first everywhere, saves and shares outrank likes everywhere, founder-led behind-the-scenes content is structurally rewarded everywhere, recurring series train return viewers, reply fast everywhere. Pack-an-order and ASMR packing is the single strongest verified format in the handmade niche; scratch reveal moments match the tickets directly; Irish language cards and scratch tickets are genuinely under-served niches on TikTok and Pinterest, lean in when relevant.`;
 
-{id:"s03",name:"Little Joy Garden",sub:"Style 03 · Hand-drawn & Warm",styleTag:"Bold",ratio:"4:5",
-base:`A cheerful, organic infographic at {SIZE}. Warm light background scattered with hand-drawn botanical leaves, small flowers, and stars. Top: a small serif Printarelle brand lockup. Centered headline in 3 progressively bolder lines telling an emotional micro-story about the gift moment. Below: an italic script line on a painted brushstroke banner. Center: a lifestyle photo of a real quiet moment — hands opening an envelope, someone reading the card. Flanking rounded bubbles and circles hold feelings not facts: words like "thought of you", "made slowly", "just because". Closing line: made with love in Mallow, Co. Cork. Chunky rounded display plus informal brush script. NEVER commercial: no prices, no phone numbers, no buy language. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f6f4ec"/><ellipse cx="12" cy="14" rx="9" ry="5" fill="#b8c8a8" transform="rotate(-30 12 14)"/><ellipse cx="188" cy="14" rx="9" ry="5" fill="#b8c8a8" transform="rotate(30 188 14)"/><ellipse cx="12" cy="242" rx="9" ry="5" fill="#b8c8a8" transform="rotate(30 12 242)"/><ellipse cx="188" cy="242" rx="9" ry="5" fill="#b8c8a8" transform="rotate(-30 188 242)"/><text x="30" y="28" font-size="8" fill="#d4c060">★</text><text x="158" y="32" font-size="6" fill="#d4c060">★</text><rect x="60" y="10" width="80" height="8" rx="2" fill="#ccc"/><rect x="40" y="24" width="120" height="8" rx="2" fill="#bbb"/><rect x="28" y="35" width="144" height="12" rx="3" fill="#aaa"/><rect x="20" y="51" width="160" height="16" rx="4" fill="#888"/><rect x="15" y="73" width="170" height="12" rx="2" fill="#999"/><rect x="45" y="90" width="110" height="6" rx="2" fill="#ccc"/><rect x="50" y="102" width="100" height="80" rx="4" fill="#c8c8c8"/><rect x="4" y="108" width="42" height="24" rx="6" fill="#d0d0d0"/><rect x="4" y="136" width="42" height="24" rx="6" fill="#d0d0d0"/><circle cx="168" cy="118" r="16" fill="#c8c8c8"/><circle cx="168" cy="146" r="14" fill="#c0c0c0"/><circle cx="30" cy="200" r="8" fill="#d5d5d5"/><circle cx="75" cy="200" r="8" fill="#d5d5d5"/><circle cx="125" cy="200" r="8" fill="#d5d5d5"/><circle cx="170" cy="200" r="8" fill="#d5d5d5"/><rect x="40" y="222" width="120" height="6" rx="2" fill="#bbb"/><rect x="55" y="232" width="90" height="4" rx="1" fill="#ccc"/></svg>`},
-
-{id:"s04",name:"Earthy Botanical",sub:"Style 04 · Natural & Textured",styleTag:"Minimal",ratio:"2:3",
-base:`An earthy, natural emotional infographic at {SIZE}. colours from the product image with soft watercolour botanical leaves at all four corners. Top: brand name "Printarelle" in three mixed-weight fonts — script, bold display, and serif — stacked. Below: a brushstroke painted banner with bold white label text. Center: a large rounded rectangle card holding an emotional quote about the gift — the feeling it creates, the memory it becomes. Below: two small side-by-side blocks with heartfelt words and a small heart centered between them. A delicate italic tagline near footer. Footer: www.printarelle.com · printarelle@gmail.com · Mallow, Co. Cork, Ireland. NEVER commercial: no prices, no phone numbers. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#f4f0e8"/><ellipse cx="10" cy="12" rx="12" ry="6" fill="#a8b898" transform="rotate(-40 10 12)"/><ellipse cx="190" cy="12" rx="12" ry="6" fill="#a8b898" transform="rotate(40 190 12)"/><ellipse cx="10" cy="288" rx="12" ry="6" fill="#a8b898" transform="rotate(40 10 288)"/><ellipse cx="190" cy="288" rx="12" ry="6" fill="#a8b898" transform="rotate(-40 190 288)"/><rect x="50" y="18" width="100" height="9" rx="3" fill="#c8b090"/><rect x="30" y="30" width="140" height="14" rx="4" fill="#a89070"/><rect x="55" y="47" width="90" height="9" rx="3" fill="#b8a080"/><rect x="10" y="62" width="180" height="14" rx="2" fill="#888"/><rect x="30" y="82" width="35" height="5" rx="1" fill="#bbb"/><circle cx="72" cy="84" r="2" fill="#aaa"/><rect x="78" y="82" width="35" height="5" rx="1" fill="#bbb"/><rect x="14" y="122" width="172" height="54" rx="6" fill="#e8e0d0"/><rect x="25" y="130" width="28" height="28" rx="4" fill="#c0b090"/><rect x="62" y="130" width="88" height="8" rx="2" fill="#bbb"/><rect x="62" y="141" width="65" height="6" rx="2" fill="#ccc"/><rect x="14" y="184" width="84" height="50" rx="5" fill="#e5ddd0"/><rect x="108" y="184" width="78" height="50" rx="5" fill="#e5ddd0"/><circle cx="101" cy="209" r="5" fill="#c08080"/><rect x="48" y="260" width="104" height="5" rx="2" fill="#ccc"/><rect x="50" y="295" width="100" height="4" rx="1" fill="#ccc"/></svg>`},
-
-{id:"s05",name:"Editorial Split",sub:"Style 05 · Warm Editorial",styleTag:"Editorial",ratio:"2:3",
-base:`A warm editorial infographic at {SIZE}. Hard vertical split: left 38% is a light-toned text column, right 62% is a full-bleed lifestyle photograph filling the full height. Left column: decorative script intro line, then a very large bold display heading telling the emotional story of this gift. An italic script descriptor line. Bold all-caps statement about what makes it special. Below: 4 feeling rows — filled circle icon, bold label, one-line italic description, dotted dividers between. Bottom-left: a rounded info card with the gift occasion. Bottom-right overlapping the photo: a dark circular badge with heartfelt bold text. Full-width footer: Printarelle · Mallow, Co. Cork, Ireland · printarelle@gmail.com · www.printarelle.com. NEVER commercial: no prices, no phone numbers. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#f5f2ec"/><rect x="76" y="0" width="124" height="284" fill="#c8c5be"/><rect x="0" y="0" width="76" height="284" fill="#f5f2ec"/><rect x="6" y="14" width="50" height="6" rx="2" fill="#c8b090"/><rect x="6" y="24" width="60" height="20" rx="3" fill="#888"/><rect x="6" y="47" width="52" height="8" rx="2" fill="#aaa"/><rect x="6" y="61" width="55" height="5" rx="2" fill="#bbb"/><text x="6" y="75" font-size="7" fill="#c08080">♥</text><rect x="16" y="70" width="36" height="5" rx="1" fill="#999"/><text x="54" y="75" font-size="7" fill="#c08080">♥</text><line x1="6" y1="82" x2="68" y2="82" stroke="#ccc" stroke-width="1" stroke-dasharray="3,2"/><rect x="6" y="88" width="62" height="12" rx="2" fill="#999"/><circle cx="11" cy="112" r="4" fill="#888"/><rect x="17" y="109" width="45" height="4" rx="1" fill="#bbb"/><circle cx="11" cy="132" r="4" fill="#888"/><rect x="17" y="129" width="45" height="4" rx="1" fill="#bbb"/><circle cx="11" cy="152" r="4" fill="#888"/><rect x="17" y="149" width="45" height="4" rx="1" fill="#bbb"/><circle cx="11" cy="172" r="4" fill="#888"/><rect x="17" y="169" width="45" height="4" rx="1" fill="#bbb"/><rect x="6" y="200" width="62" height="40" rx="4" fill="#e8e4dc"/><circle cx="122" cy="230" r="22" fill="#555"/><rect x="108" y="225" width="28" height="5" rx="1" fill="#e8d090"/><line x1="76" y1="0" x2="76" y2="284" stroke="#ddd" stroke-width="1"/><rect x="0" y="284" width="200" height="16" fill="#888"/></svg>`},
-
-{id:"s06",name:"Minimal Easel",sub:"Style 06 · Luxury Minimal",styleTag:"Minimal",ratio:"4:5",
-base:`An elegant, minimal emotional infographic at {SIZE}. Near-white background with soft fabric texture. Top centered: a two-line serif + script mixed headline — bold serif first line about the feeling this gift creates, delicate italic script second. A fine hairline separator with a small heart below. A bold all-caps emotional statement. Left: a soft circular badge reading "Handmade in Cork, Ireland". Right: the product on a natural wooden easel with smaller pieces on a linen surface with sprigs of greenery. Bottom strip: 4 equally spaced icon + label pairs each with a thin decorative icon and small-caps emotional label below. A soft pill note: "Printarelle · www.printarelle.com". Generous white space throughout. NEVER commercial: no prices, no phone numbers. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f8f6f2"/><rect x="40" y="12" width="120" height="8" rx="2" fill="#bbb"/><rect x="52" y="23" width="96" height="6" rx="2" fill="#c8c0b0"/><line x1="50" y1="34" x2="150" y2="34" stroke="#ddd" stroke-width="1"/><text x="96" y="39" font-size="9" fill="#c89090">♥</text><rect x="38" y="44" width="124" height="7" rx="2" fill="#bbb"/><circle cx="32" cy="110" r="22" fill="#e8e2d8"/><circle cx="32" cy="110" r="18" fill="none" stroke="#ccc" stroke-width="1.2"/><line x1="90" y1="170" x2="78" y2="200" stroke="#c8a870" stroke-width="3"/><line x1="90" y1="170" x2="102" y2="200" stroke="#c8a870" stroke-width="3"/><line x1="100" y1="180" x2="130" y2="200" stroke="#c8a870" stroke-width="3"/><line x1="100" y1="180" x2="142" y2="200" stroke="#c8a870" stroke-width="3"/><rect x="72" y="56" width="116" height="114" rx="3" fill="#d8d8d8"/><rect x="58" y="168" width="60" height="42" rx="3" fill="#e8e4dc" transform="rotate(-3 88 189)"/><rect x="105" y="174" width="60" height="38" rx="3" fill="#e8e4dc" transform="rotate(2 135 193)"/><ellipse cx="78" cy="205" rx="8" ry="4" fill="#a8b898" transform="rotate(-20 78 205)"/><ellipse cx="152" cy="200" rx="8" ry="4" fill="#a8b898" transform="rotate(20 152 200)"/><rect x="0" y="215" width="200" height="1" fill="#ddd"/><circle cx="28" cy="228" r="8" fill="#e0dcd6"/><circle cx="78" cy="228" r="8" fill="#e0dcd6"/><circle cx="128" cy="228" r="8" fill="#e0dcd6"/><circle cx="175" cy="228" r="8" fill="#e0dcd6"/><rect x="50" y="248" width="100" height="7" rx="3.5" fill="#e8e0d0"/></svg>`},
-
-{id:"s07",name:"Step Journey",sub:"Style 07 · Instructional & Sequential",styleTag:"Bold",ratio:"2:3",
-base:`An emotional journey infographic at {SIZE}. Clean light background with subtle dot-grid pattern. Top: a bold wide banner with an emotional headline about the gift-giving moment. Below: a short italic line "Handmade for you in Mallow, Co. Cork, Ireland". Center: a vertical step sequence — 4 numbered moments in the gift journey (e.g. You thought of them / You chose something personal / It arrived wrapped with care / They'll never forget). Each step has a large filled circle, a bold step title, 1-2 lines. Steps connected by thin dotted vertical lines. Rows alternate subtle background tints. Below: a product photo in a rounded frame. Bottom: 3 feeling badges in circles. Footer: a full-width bar — www.printarelle.com · printarelle@gmail.com. NEVER commercial: no prices, no phone numbers. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#f5f4f0"/><pattern id="dots" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="0.8" fill="#ddd"/></pattern><rect width="200" height="300" fill="url(#dots)"/><rect x="0" y="0" width="200" height="22" fill="#888"/><rect x="12" y="8" width="120" height="6" rx="2" fill="#eee"/><rect x="30" y="28" width="140" height="5" rx="2" fill="#ccc"/><rect x="8" y="42" width="184" height="36" rx="4" fill="#eeebe5"/><circle cx="26" cy="60" r="12" fill="#888"/><line x1="26" y1="78" x2="26" y2="90" stroke="#ccc" stroke-width="1.5" stroke-dasharray="3,2"/><rect x="46" y="48" width="80" height="7" rx="2" fill="#aaa"/><rect x="46" y="58" width="100" height="4" rx="1" fill="#ccc"/><rect x="8" y="90" width="184" height="36" rx="4" fill="#f5f2ec"/><circle cx="26" cy="108" r="12" fill="#999"/><line x1="26" y1="126" x2="26" y2="138" stroke="#ccc" stroke-width="1.5" stroke-dasharray="3,2"/><rect x="46" y="96" width="80" height="7" rx="2" fill="#aaa"/><rect x="46" y="106" width="100" height="4" rx="1" fill="#ccc"/><rect x="8" y="138" width="184" height="36" rx="4" fill="#eeebe5"/><circle cx="26" cy="156" r="12" fill="#888"/><line x1="26" y1="174" x2="26" y2="186" stroke="#ccc" stroke-width="1.5" stroke-dasharray="3,2"/><rect x="46" y="144" width="80" height="7" rx="2" fill="#aaa"/><rect x="8" y="186" width="184" height="36" rx="4" fill="#f5f2ec"/><circle cx="26" cy="204" r="12" fill="#999"/><rect x="46" y="192" width="80" height="7" rx="2" fill="#aaa"/><rect x="38" y="232" width="124" height="32" rx="5" fill="#c8c8c8"/><circle cx="44" cy="278" r="12" fill="#d0d0d0"/><circle cx="100" cy="278" r="12" fill="#d0d0d0"/><circle cx="156" cy="278" r="12" fill="#d0d0d0"/><rect x="0" y="294" width="200" height="6" fill="#888"/></svg>`},
-
-{id:"s08",name:"Maximalist Pop",sub:"Style 08 · Bold Pop & Energetic",styleTag:"Bold",ratio:"4:5",
-base:`A maximalist, joyful announcement infographic at {SIZE}. Vivid solid background. Entirely centered text-dominant layout. Top: a small rounded pill badge with a heart icon and short emotional label. Below: an extremely large chunky bold headline in 3 lines about the joy of giving — each line in a distinct accent tone. Below that: a filled rounded ribbon banner with smaller bold white headline about the handmade nature. Then: another large bold mixed-tone text line carrying an emotional truth. A short transition phrase. A dashed-border rounded rectangle containing two side-by-side feeling blocks — icon + bold label + short description each. Scattered decorative elements: hearts, small flowers, 4-pointed stars, dots, a rainbow arc. Brand note: Handmade by Printarelle in Cork, Ireland. printarelle@gmail.com. No phone numbers. NEVER commercial: no prices, no buy language. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f0eee8"/><rect x="158" y="8" width="34" height="18" rx="5" fill="#ccc"/><rect x="62" y="10" width="76" height="12" rx="6" fill="#ddd"/><rect x="50" y="28" width="100" height="10" rx="3" fill="#bbb"/><rect x="30" y="42" width="140" height="14" rx="3" fill="#aaa"/><rect x="10" y="60" width="180" height="18" rx="4" fill="#999"/><rect x="8" y="84" width="184" height="16" rx="4" fill="#888"/><rect x="20" y="106" width="160" height="14" rx="3" fill="#aaa"/><rect x="55" y="124" width="90" height="6" rx="2" fill="#ccc"/><rect x="14" y="136" width="172" height="48" rx="6" fill="none" stroke="#aaa" stroke-width="1.5" stroke-dasharray="5,3"/><circle cx="60" cy="152" r="10" fill="#d8d8d8"/><text x="98" y="157" font-size="12" fill="#aaa" text-anchor="middle">&amp;</text><circle cx="140" cy="152" r="10" fill="#d8d8d8"/><text x="8" y="90" font-size="10" fill="#d09090">♥</text><text x="180" y="90" font-size="10" fill="#d09090">♥</text><path d="M 148 256 Q 190 220 200 256" fill="none" stroke="#e0b0b0" stroke-width="4"/><rect x="72" y="220" width="56" height="4" rx="2" fill="#ccc"/></svg>`},
-
-{id:"s09",name:"Dark Luxury",sub:"Style 09 · High-End Dark Background",styleTag:"Dark",ratio:"4:5",
-base:`A dark, luxury emotional infographic at {SIZE}. Very deep colours from the product image throughout. Centered vertical layout. Top: a refined wordmark "Printarelle" in a colours from the product image, small and precise. Below: a large two-line elegant serif headline in light tone telling an intimate emotional truth about this gift. A fine horizontal rule beneath. Center: a single product photograph — dramatically lit on a dark surface, editorial still-life style. Below: a short italic line about the handmade nature. Then: 3 feeling descriptors in a clean horizontal row separated by thin vertical rules. The overall mood is quiet, restrained, intimate. www.printarelle.com · Mallow, Cork. No phone numbers. NEVER commercial: no prices, no buy language. Pure restraint. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#1a1a1a"/><rect x="52" y="14" width="96" height="6" rx="2" fill="#888"/><rect x="24" y="28" width="152" height="10" rx="2" fill="#777"/><rect x="30" y="41" width="140" height="10" rx="2" fill="#666"/><line x1="40" y1="57" x2="160" y2="57" stroke="#444" stroke-width="1"/><rect x="14" y="66" width="172" height="110" rx="4" fill="#2e2e2e"/><rect x="30" y="80" width="140" height="82" rx="3" fill="#3a3a3a"/><ellipse cx="100" cy="121" rx="40" ry="30" fill="#444"/><rect x="44" y="184" width="112" height="5" rx="2" fill="#555"/><line x1="66" y1="196" x2="66" y2="216" stroke="#444" stroke-width="1"/><line x1="134" y1="196" x2="134" y2="216" stroke="#444" stroke-width="1"/><circle cx="33" cy="198" r="7" fill="none" stroke="#555" stroke-width="1"/><circle cx="100" cy="198" r="7" fill="none" stroke="#555" stroke-width="1"/><circle cx="167" cy="198" r="7" fill="none" stroke="#555" stroke-width="1"/><rect x="56" y="246" width="88" height="4" rx="1" fill="#444"/></svg>`},
-
-{id:"s10",name:"Nordic Minimal",sub:"Style 10 · Scandinavian Asymmetric",styleTag:"Minimal",ratio:"4:5",
-base:`A clean, Scandinavian-minimal emotional infographic at {SIZE}. Near-white background with extreme negative space — content occupies less than 55% of the canvas. Deliberately asymmetric — nothing centered. Top-left: a small geometric Printarelle logo mark. Top-right: a very large bold outline numeral in a ghosted light tone, purely decorative. Center-left: a sharp precisely cropped product photograph — flatlay or 45-degree angle. To the right and below: a tight vertical text stack — 1 large serif headline about the emotional weight of the gift, 1 small italic emotional descriptor, 3 minimal feeling lines with thin dash bullets. Bottom: a single fine horizontal rule, then 3 items in small tracked caps — "Handmade · Mallow, Cork · www.printarelle.com". Printarelle@gmail.com. No phone numbers. NEVER commercial. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f8f8f5"/><rect x="10" y="12" width="16" height="16" rx="2" fill="#ccc"/><rect x="14" y="16" width="8" height="8" rx="1" fill="#f8f8f5"/><text x="110" y="80" font-size="88" fill="#ebebeb" font-weight="900" font-family="serif">8</text><rect x="10" y="56" width="105" height="120" rx="3" fill="#d8d8d8"/><rect x="125" y="72" width="65" height="10" rx="2" fill="#aaa"/><rect x="125" y="86" width="55" height="6" rx="2" fill="#bbb" opacity=".7"/><rect x="125" y="104" width="4" height="4" rx="1" fill="#ccc"/><rect x="132" y="104" width="52" height="4" rx="1" fill="#ddd"/><rect x="125" y="114" width="4" height="4" rx="1" fill="#ccc"/><rect x="132" y="114" width="48" height="4" rx="1" fill="#ddd"/><rect x="125" y="124" width="4" height="4" rx="1" fill="#ccc"/><rect x="132" y="124" width="50" height="4" rx="1" fill="#ddd"/><line x1="10" y1="220" x2="190" y2="220" stroke="#ddd" stroke-width="1"/><rect x="10" y="226" width="50" height="4" rx="1" fill="#ccc"/><rect x="75" y="226" width="50" height="4" rx="1" fill="#ccc"/><rect x="140" y="226" width="50" height="4" rx="1" fill="#ccc"/></svg>`},
-
-{id:"s11",name:"Vintage Artisan",sub:"Style 11 · Retro Stamp & Seal",styleTag:"Vintage",ratio:"2:3",
-base:`A vintage, artisan-style emotional infographic at {SIZE}. Warm colours from the product image with subtle grain. Top: a large ornate circular badge/seal with concentric decorative border rings, a ribbon banner across the center, and small laurels. Inside: "Handmade by Printarelle · Mallow, Cork, Ireland" in bold condensed serif. Below: a horizontal ribbon banner element. Center: product photograph treated with a slight warm matte filter, framed inside a thin decorative stamp border. Below: 4 feeling items in two columns — small hand-drawn icon and bold emotional label + short description. Bottom: 3 circular stamp-style badges with emotional single words. Footer: a thin double-rule line with a small ornamental motif centered. printarelle@gmail.com · www.printarelle.com. No phone numbers. NEVER commercial. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#f2ebe0"/><circle cx="100" cy="58" r="48" fill="#e8dfc8"/><circle cx="100" cy="58" r="44" fill="none" stroke="#b0a080" stroke-width="2"/><circle cx="100" cy="58" r="40" fill="none" stroke="#b0a080" stroke-width="1"/><rect x="52" y="48" width="96" height="20" fill="#999"/><polygon points="52,48 46,58 52,68" fill="#888"/><polygon points="148,48 154,58 148,68" fill="#888"/><rect x="68" y="25" width="64" height="5" rx="1" fill="#b0a080"/><rect x="72" y="75" width="56" height="5" rx="1" fill="#b0a080"/><text x="55" y="62" font-size="8" fill="#c8b060">★</text><text x="136" y="62" font-size="8" fill="#c8b060">★</text><rect x="10" y="114" width="180" height="18" rx="2" fill="#999"/><polygon points="10,114 4,123 10,132" fill="#888"/><polygon points="190,114 196,123 190,132" fill="#888"/><rect x="22" y="140" width="156" height="88" rx="2" fill="#e5ddd0"/><rect x="26" y="144" width="148" height="80" rx="1" fill="#c8c0b8"/><circle cx="24" cy="248" r="6" fill="#c0b090"/><circle cx="114" cy="248" r="6" fill="#c0b090"/><circle cx="24" cy="264" r="6" fill="#c0b090"/><circle cx="114" cy="264" r="6" fill="#c0b090"/><circle cx="38" cy="284" r="12" fill="#d8d0c0"/><circle cx="100" cy="284" r="12" fill="#d8d0c0"/><circle cx="162" cy="284" r="12" fill="#d8d0c0"/><line x1="10" y1="296" x2="190" y2="296" stroke="#c0b090" stroke-width="1"/><line x1="10" y1="299" x2="190" y2="299" stroke="#c0b090" stroke-width=".5"/></svg>`},
-
-{id:"s12",name:"Handmade Craft Market",sub:"Style 12 · Rustic Hand-lettered",styleTag:"Vintage",ratio:"4:5",
-base:`A handmade, craft-market style emotional infographic at {SIZE}. Slightly textured kraft paper background with visible paper grain. Intentionally imperfect layout — elements are hand-arranged. Top: a large hand-lettered style headline in 2 lines about the personal feeling this gift carries, mixing irregular brush script with rougher block-print lettering. Below: a wavy hand-drawn underline. Center: a product photograph on a wooden or natural surface. Feeling list: 4 points in casual hand-lettered style on gently slanted lines with hand-drawn asterisk bullets. Scattered accents: botanical sprigs, hearts, stars in thin hand-drawn ink style. Bottom: a hand-drawn rectangular border with small text — Handmade by Printarelle · Mallow, Co. Cork, Ireland · www.printarelle.com · printarelle@gmail.com. No phone numbers. NEVER commercial. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f5f0e8"/><line x1="0" y1="40" x2="200" y2="42" stroke="#ece8e0" stroke-width=".5"/><line x1="0" y1="80" x2="200" y2="82" stroke="#ece8e0" stroke-width=".5"/><rect x="18" y="12" width="120" height="14" rx="4" fill="#999" transform="rotate(-1 78 19)"/><rect x="22" y="29" width="100" height="10" rx="4" fill="#bbb" transform="rotate(.5 72 34)"/><path d="M 18 44 Q 40 48 60 44 Q 80 40 100 44 Q 120 48 140 44 Q 160 40 180 44" fill="none" stroke="#c0b090" stroke-width="2"/><ellipse cx="10" cy="60" rx="8" ry="4" fill="#b0c090" transform="rotate(-30 10 60)"/><ellipse cx="185" cy="55" rx="8" ry="4" fill="#b0c090" transform="rotate(30 185 55)"/><rect x="36" y="56" width="128" height="90" rx="3" fill="#d0c8bc" transform="rotate(1.5 100 101)"/><text x="20" y="162" font-size="7" fill="#c0b060">✱</text><rect x="30" y="157" width="130" height="6" rx="2" fill="#bbb" transform="rotate(-.5 95 160)"/><text x="20" y="178" font-size="7" fill="#c0b060">✱</text><rect x="30" y="173" width="118" height="6" rx="2" fill="#bbb" transform="rotate(.5 89 176)"/><text x="20" y="194" font-size="7" fill="#c0b060">✱</text><rect x="30" y="189" width="124" height="6" rx="2" fill="#bbb" transform="rotate(-.3 92 192)"/><text x="166" y="170" font-size="9" fill="#d09090">♥</text><rect x="12" y="218" width="176" height="32" rx="2" fill="none" stroke="#b0a080" stroke-width="1.5"/><rect x="30" y="226" width="60" height="6" rx="2" fill="#bbb"/><rect x="28" y="236" width="144" height="4" rx="1" fill="#ccc"/></svg>`},
-
-{id:"s13",name:"Bauhaus Bands",sub:"Style 13 · Geometric Hard-Edge",styleTag:"Bold",ratio:"2:3",
-base:`A bold, Bauhaus-inspired emotional infographic at {SIZE}. The canvas is divided into 5 distinct full-width horizontal bands, each a solid contrasting fill — no gradients, no rounded corners. Band 1 (dark): a very large all-caps bold condensed emotional headline about the gift. Band 2 (light): the product photograph centered, hard-edged. Band 3 (accent): a single bold emotional statement in very large text. Brand note: "Handmade by Printarelle · Mallow, Co. Cork, Ireland". Band 4 (mid tone): 3 feeling descriptors in a horizontal row inside simple rectangles. Band 5 (light): www.printarelle.com · printarelle@gmail.com. No phone numbers. NEVER commercial: no prices, no buy language. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="200" height="62" fill="#666"/><rect x="0" y="62" width="200" height="80" fill="#e8e4dc"/><rect x="0" y="142" width="200" height="52" fill="#aaa"/><rect x="0" y="194" width="200" height="60" fill="#ccc"/><rect x="0" y="254" width="200" height="46" fill="#f0ede8"/><rect x="10" y="14" width="110" height="12" rx="1" fill="#e0e0e0"/><rect x="10" y="29" width="80" height="10" rx="1" fill="#ccc"/><rect x="160" y="14" width="30" height="30" fill="#888"/><rect x="20" y="70" width="160" height="64" fill="#c8c5be"/><rect x="70" y="150" width="120" height="10" rx="1" fill="#f0f0f0"/><rect x="10" y="200" width="54" height="46" fill="#b8b8b8"/><circle cx="37" cy="216" r="10" fill="#e0e0e0"/><rect x="74" y="200" width="54" height="46" fill="#b8b8b8"/><circle cx="101" cy="216" r="10" fill="#e0e0e0"/><rect x="138" y="200" width="52" height="46" fill="#b8b8b8"/><circle cx="164" cy="216" r="10" fill="#e0e0e0"/><rect x="10" y="262" width="100" height="10" rx="1" fill="#aaa"/><rect x="10" y="275" width="80" height="7" rx="1" fill="#bbb"/></svg>`},
-
-{id:"s14",name:"Pastel Shape Grid",sub:"Style 14 · Soft Geometric Blocks",styleTag:"Soft",ratio:"4:5",
-base:`A soft, pastel geometric emotional infographic at {SIZE}. Light background. The entire layout is built on a consistent grid of rounded rectangles, circles, and pill shapes — every content zone lives inside its own softly toned shape. Top zone: a wide rounded rectangle containing the main emotional headline in 2 lines. Second row: a small circle block (left, short emotional label) and a large rounded square (right, product photograph). Third row: 3 equal rounded square blocks — each with a feeling icon at top, bold emotional short label, and 1-line description. Bottom zone: a full-width rounded rectangle with a heartfelt closing message. Brand note inside a shape: "Handmade by Printarelle · www.printarelle.com · Mallow, Co. Cork, Ireland". No phone numbers. NEVER commercial. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f5f3ef"/><rect x="8" y="8" width="184" height="40" rx="10" fill="#e8e4dc" stroke="#d8d0c0" stroke-width="1"/><rect x="28" y="20" width="144" height="8" rx="3" fill="#bbb"/><rect x="40" y="31" width="120" height="7" rx="3" fill="#ccc"/><circle cx="38" cy="86" r="28" fill="#ddd" stroke="#c8c0b0" stroke-width="1"/><rect x="78" y="58" width="114" height="58" rx="10" fill="#d8d8d8" stroke="#c8c0b0" stroke-width="1"/><rect x="82" y="62" width="106" height="50" rx="8" fill="#c8c5c0"/><rect x="8" y="126" width="56" height="64" rx="10" fill="#e4e0d8" stroke="#d0c8b8" stroke-width="1"/><circle cx="36" cy="146" r="12" fill="#ccc"/><rect x="72" y="126" width="56" height="64" rx="10" fill="#e4e0d8" stroke="#d0c8b8" stroke-width="1"/><circle cx="100" cy="146" r="12" fill="#ccc"/><rect x="136" y="126" width="56" height="64" rx="10" fill="#e4e0d8" stroke="#d0c8b8" stroke-width="1"/><circle cx="164" cy="146" r="12" fill="#ccc"/><rect x="8" y="200" width="184" height="48" rx="10" fill="#e8e4dc" stroke="#d8d0c0" stroke-width="1"/><rect x="28" y="228" width="144" height="7" rx="3" fill="#bbb"/></svg>`},
-
-{id:"s15",name:"Sticker Sheet",sub:"Style 15 · Sticker Sheet Aesthetic",styleTag:"Bold",ratio:"4:5",
-base:`A sticker-art emotional infographic at {SIZE}. Clean white background. Every element is designed to look like a die-cut sticker — thick white outline border, soft drop shadow, and a slight rotation as if hand-placed. Central large sticker: the product photograph inside a wavy or scalloped die-cut shape. Surrounding stickers: a star-shaped sticker with the main emotional headline; a speech-bubble sticker with a feeling callout; a heart-shaped sticker with a short bold label; a round stamp sticker reading "Handmade by Printarelle"; a rectangular sticker with "Mallow, Co. Cork, Ireland"; an arrow sticker. Brand sticker: www.printarelle.com and printarelle@gmail.com. No phone numbers. Decorative mini-stickers: sparkles, dots, small hearts, tiny stars. NEVER commercial: no prices. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#ffffff"/><circle cx="100" cy="118" r="68" fill="#e8e8e8"/><circle cx="100" cy="118" r="58" fill="#c8c5c0"/><polygon points="38,20 42,34 56,34 45,43 49,57 38,48 27,57 31,43 20,34 34,34" fill="#e0e0e0" transform="rotate(-8 38 38)"/><rect x="138" y="14" width="52" height="38" rx="8" fill="#e0e0e0" transform="rotate(6 164 33)"/><path d="M38 196 C38 190 28 182 22 188 C16 194 22 202 38 212 C54 202 60 194 54 188 C48 182 38 190 38 196Z" fill="#e8e0dc" transform="rotate(-5 38 197)"/><circle cx="164" cy="208" r="26" fill="#e0e0d8"/><circle cx="164" cy="208" r="22" fill="none" stroke="#ccc" stroke-width="1.5"/><rect x="6" y="100" width="58" height="30" rx="6" fill="#e8e8e0" transform="rotate(-6 35 115)"/><rect x="148" y="100" width="42" height="22" rx="6" fill="#e0e0e0" transform="rotate(5 169 111)"/><text x="92" y="24" font-size="10" fill="#e0d090">✦</text><text x="14" y="72" font-size="8" fill="#e0b0b0">♥</text><text x="178" y="172" font-size="8" fill="#b0d0e0">✿</text></svg>`},
-
-{id:"s16",name:"Typographic Poster",sub:"Style 16 · Type-First, No Icons",styleTag:"Editorial",ratio:"2:3",
-base:`A bold typographic emotional infographic at {SIZE}. Strong solid background. Typography is the primary design element — 78% of the canvas is text. Top: an extremely wide ultra-bold condensed word spanning full width about the gift feeling. Below: a stark contrasting line in ultra-thin italic serif. Center: a product image that is small and precise, surrounded by large typographic elements — oversized ghosted letterforms at low opacity. Below image: a bold geometric horizontal rule, then a 3-line emotional feature summary in carefully mixed type sizes. Lower third: alternating lines of large all-caps geometric sans and small-tracking italic serif. Footer: a full-width filled bar. Brand: Printarelle · Handmade in Mallow, Co. Cork, Ireland · www.printarelle.com · printarelle@gmail.com. No phone numbers, no icons. NEVER commercial. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#e8e5e0"/><rect x="2" y="10" width="196" height="22" rx="2" fill="#888"/><rect x="20" y="36" width="160" height="4" rx="1" fill="#b0a898" opacity=".6"/><text x="20" y="130" font-size="120" fill="#ddd" font-weight="900" opacity=".4">P</text><rect x="68" y="56" width="84" height="70" rx="4" fill="#c8c5c0"/><text x="8" y="88" font-size="40" fill="#999" opacity=".5">"</text><text x="170" y="130" font-size="40" fill="#999" opacity=".5">"</text><rect x="14" y="132" width="172" height="3" fill="#999"/><rect x="20" y="140" width="160" height="9" rx="2" fill="#888"/><rect x="40" y="153" width="120" height="6" rx="2" fill="#aaa"/><rect x="30" y="163" width="140" height="9" rx="2" fill="#888"/><rect x="10" y="180" width="180" height="11" rx="1" fill="#999"/><rect x="30" y="195" width="140" height="5" rx="1" fill="#bbb" opacity=".7"/><rect x="10" y="204" width="180" height="11" rx="1" fill="#999"/><rect x="0" y="256" width="200" height="44" fill="#555"/><rect x="14" y="266" width="120" height="6" rx="2" fill="#888"/></svg>`},
-
-{id:"s17",name:"Full-Bleed Photo",sub:"Style 17 · Lifestyle Photo-Dominant",styleTag:"Photo",ratio:"4:5",
-base:`A photo-dominant lifestyle emotional infographic at {SIZE}. A single large lifestyle photograph fills the entire canvas — well-lit, beautifully styled product in a real-world gifting setting. Over the photo: a semi-transparent gradient layer at top and bottom thirds. Top overlay: small brand label "Printarelle" in tracked light caps. Below: a 2-line bold serif headline in white about the emotional weight of the gift. Bottom overlay: a frosted glass-effect rounded rectangle card containing 3-4 emotional feeling lines in clean white sans-serif with thin separator rules. Feature: "Handmade in Mallow, Co. Cork, Ireland". Very bottom: "www.printarelle.com · printarelle@gmail.com" in tiny caps. No phone numbers. NEVER commercial: no prices, no buy language. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#c0bdb8"/><ellipse cx="100" cy="128" rx="70" ry="60" fill="#b0ada8" opacity=".5"/><rect x="0" y="0" width="200" height="70" fill="#000" opacity=".42"/><rect x="58" y="14" width="84" height="5" rx="2" fill="#f0ece0" opacity=".8"/><rect x="20" y="24" width="160" height="10" rx="2" fill="#f5f5f0" opacity=".9"/><rect x="30" y="38" width="140" height="10" rx="2" fill="#eeeeea" opacity=".85"/><rect x="0" y="170" width="200" height="86" fill="#000" opacity=".45"/><rect x="12" y="148" width="176" height="74" rx="10" fill="#f0ece0" opacity=".22"/><rect x="12" y="148" width="176" height="74" rx="10" fill="none" stroke="#f0ece0" stroke-width="1" opacity=".4"/><rect x="22" y="158" width="156" height="4" rx="1" fill="#fff" opacity=".7"/><rect x="22" y="170" width="130" height="4" rx="1" fill="#fff" opacity=".7"/><rect x="22" y="182" width="144" height="4" rx="1" fill="#fff" opacity=".7"/><rect x="36" y="248" width="128" height="4" rx="1" fill="#f0ece0" opacity=".6"/></svg>`},
-
-{id:"s18",name:"Scrapbook Collage",sub:"Style 18 · Mixed-Media Craft",styleTag:"Vintage",ratio:"2:3",
-base:`A scrapbook collage-style emotional infographic at {SIZE}. Warm textured paper or linen background. The composition is built from overlapping physical-media-style layers. Elements include: a large torn-edge paper block behind the product photo with visible rough torn border slightly off-angle; the product photograph with 2-4 degrees rotation; a washi-tape strip crossing one corner; a small hand-written notecard label; a printed text block on lighter paper with torn-edge bottom about the emotional story of this gift; a small hang-tag reading "Handmade by Printarelle". Scattered accents: small gummed star stickers, hand-drawn doodle border, small botanical illustrations. Bottom: a ruled notecard strip — Printarelle · Mallow, Co. Cork, Ireland · www.printarelle.com · printarelle@gmail.com. No phone numbers. NEVER commercial. Colors derived from uploaded reference image.`,
-svg:`<svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="300" fill="#f2ede4"/><line x1="0" y1="50" x2="200" y2="52" stroke="#e8e4dc" stroke-width=".5"/><polygon points="18,42 188,38 192,180 14,185" fill="#ece5d8"/><polyline points="18,42 22,38 28,44 36,40 44,46 52,41 60,45 70,40 80,44 90,40 100,45 112,39 122,44 132,40 144,46 156,41 166,45 178,40 188,38" fill="#ece5d8" stroke="#e0d8c8" stroke-width="1"/><rect x="-10" y="50" width="240" height="18" fill="#d0c8b0" opacity=".6" transform="rotate(-12 100 59)"/><rect x="30" y="56" width="140" height="110" rx="2" fill="#d0ccc6" transform="rotate(2 100 111)"/><polygon points="30,56 38,56 30,64" fill="#c8b890" transform="rotate(2 34 60)"/><polygon points="168,56 176,56 176,64" fill="#c8b890" transform="rotate(2 172 60)"/><rect x="10" y="188" width="90" height="40" rx="2" fill="#faf8f0" transform="rotate(-2 55 208)"/><rect x="15" y="195" width="70" height="5" rx="1" fill="#d0c8b0" transform="rotate(-2 50 197)"/><rect x="108" y="186" width="82" height="48" rx="1" fill="#f5f2ec"/><rect x="154" y="235" width="36" height="30" rx="3" fill="#ece0c8"/><ellipse cx="12" cy="245" rx="10" ry="5" fill="#a8b890" transform="rotate(-30 12 245)"/><text x="82" y="250" font-size="9" fill="#d4c870">★</text><rect x="0" y="270" width="200" height="30" fill="#f8f5ee"/><line x1="0" y1="270" x2="200" y2="270" stroke="#d8d0c0" stroke-width="1"/><rect x="14" y="277" width="140" height="4" rx="1" fill="#bbb"/></svg>`}
-];
-
-const SIZES = [
-  {id:"4:5", label:"4:5 Feed", px:"1080×1350px"},
-  {id:"1:1", label:"1:1 Square", px:"1080×1080px"},
-  {id:"2:3", label:"2:3 Pinterest", px:"1000×1500px"},
-  {id:"9:16", label:"9:16 Story", px:"1080×1920px"},
-];
-
-// ============ NEW STYLES based on Natali's actual images ============
-INFOG_STYLES.push(
-{id:"s19",name:"Helpful Guide",sub:"Style 19 · Editorial Guide Split",styleTag:"Editorial",ratio:"4:5",
-base:`An editorial guide-style infographic at {SIZE} in the style of a helpful magazine article, NOT a product ad. Hard left/right split: left 45% is a clean cream or white text column, right 55% is a beautiful lifestyle product photograph. LEFT COLUMN: Top: a small pill badge reading "A helpful guide" or "From Printarelle". Then: a very large bold headline across 3-4 lines in mixed weight — the headline answers a real question or speaks to an occasion (e.g. "What to write in a [occasion] card" or "The most personal gift for [occasion]"). One or two lines of warm descriptive subtext. Below: 2-3 small soft circle icon blocks with single-word emotional labels (e.g. "Heartfelt", "Personal", "Handmade"). Very bottom: fine tracked text "printarelle.com" barely visible. RIGHT COLUMN: Full-bleed lifestyle photograph — soft natural light, real linen or marble surface, the card or product resting naturally with ribbon, dried florals, or gypsophila. MAXIMUM text on the entire image: headline (max 12 words across 3-4 lines) + 2 lines subtext + 3 icon labels + printarelle.com. Nothing else. Human, editorial, warm.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#faf8f4"/><rect x="0" y="0" width="90" height="256" fill="#faf8f4"/><rect x="90" y="0" width="110" height="256" fill="#d8d4ce"/><ellipse cx="145" cy="128" rx="40" ry="50" fill="#c8c4be" opacity=".5"/><rect x="90" y="0" width="110" height="256" fill="#c8c5be"/><rect x="95" y="20" width="100" height="80" rx="2" fill="#d8d5d0"/><ellipse cx="150" cy="140" rx="35" ry="45" fill="#c0bdb8" opacity=".6"/><rect x="6" y="12" width="56" height="10" rx="5" fill="#e8e0d0"/><rect x="14" y="14" width="40" height="6" rx="2" fill="#bbb"/><rect x="6" y="28" width="72" height="14" rx="2" fill="#aaa"/><rect x="6" y="45" width="65" height="14" rx="2" fill="#bbb"/><rect x="6" y="62" width="58" height="12" rx="2" fill="#ccc"/><rect x="6" y="80" width="70" height="5" rx="1" fill="#ccc"/><rect x="6" y="88" width="60" height="5" rx="1" fill="#ddd"/><line x1="6" y1="100" x2="80" y2="100" stroke="#e0d8c8" stroke-width="1"/><circle cx="18" cy="114" r="10" fill="#ede8e0"/><rect x="10" y="126" width="16" height="3" rx="1" fill="#ccc"/><circle cx="44" cy="114" r="10" fill="#ede8e0"/><rect x="36" y="126" width="16" height="3" rx="1" fill="#ccc"/><circle cx="70" cy="114" r="10" fill="#ede8e0"/><rect x="62" y="126" width="16" height="3" rx="1" fill="#ccc"/><rect x="14" y="248" width="55" height="3" rx="1" fill="#ccc"/></svg>`},
-
-{id:"s20",name:"Occasion Story",sub:"Style 20 · Lifestyle Product Story",styleTag:"Photo",ratio:"4:5",
-base:`A warm lifestyle product story infographic at {SIZE} — NOT a product ad, a human moment captured beautifully. Full lifestyle photography fills the canvas. Scene: the product/card is shown naturally on a soft surface — aged linen, warm wood, a white bedside table — surrounded by natural props that match the occasion (ribbon for a celebration, dried florals for a wedding, baby shoes for a new arrival). The scene looks like something a real person styled, not a stock photo. Soft natural window light or colours from the product imageen light. TEXT on the image: strictly minimum. Top area: one short elegant line in italic serif — the occasion name or a gentle dedication (e.g. "For your beautiful girl" or "On her Debs night" — max 6 words). Center or lower: one bold mixed-weight headline of max 6 words that captures the emotional moment. Below: one tiny italic line "Personalised just for her" or "Made by hand, with love" — max 6 words. Very bottom: fine tracked "printarelle.com · Handmade in Cork, Ireland" in tiny caps, barely visible. TOTAL text on entire image: max 20 words across 4 short lines. Everything else is told by the photography.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#d8d2c8"/><rect x="0" y="0" width="200" height="256" fill="#c8c2b8"/><ellipse cx="100" cy="100" rx="70" ry="60" fill="#b8b2a8" opacity=".5"/><rect x="40" y="60" width="120" height="90" rx="3" fill="#e8e4de"/><rect x="44" y="64" width="112" height="82" rx="2" fill="#e0dcd6"/><rect x="55" y="180" width="30" height="20" rx="2" fill="#d0c8b8" transform="rotate(-15 70 190)"/><ellipse cx="30" cy="200" rx="18" ry="8" fill="#a8b890" opacity=".6" transform="rotate(-20 30 200)"/><ellipse cx="170" cy="50" rx="14" ry="6" fill="#a8b890" opacity=".5" transform="rotate(25 170 50)"/><rect x="5" y="5" width="80" height="15" rx="2" fill="#000" opacity=".18"/><rect x="20" y="8" width="50" height="9" rx="1" fill="#f8f5f0" opacity=".7"/><rect x="0" y="200" width="200" height="56" fill="#000" opacity=".25"/><rect x="30" y="210" width="140" height="12" rx="2" fill="#fff" opacity=".8"/><rect x="50" y="226" width="100" height="7" rx="1" fill="#f0ece4" opacity=".6"/><rect x="55" y="245" width="90" height="4" rx="1" fill="#f0ece4" opacity=".4"/></svg>`}
-);
-
-// ============ PRODUCT INFO RULES (for how-to, what's included, feature styles) ============
-const PRODUCT_INFOG_RULES = `
-PRODUCT INFO RULES — these replace the lifestyle rules for informational styles:
-
-COLOURS: Never hardcode colours. All colours must come from the uploaded product reference image.
-BACKGROUND: Always bright, clean and white or very light. Never dark or moody.
-ENVELOPE: White, natural kraft, or omitted. Never coloured.
-NO PRICES anywhere. No "buy now" or sales language.
-PRODUCT is always the hero — minimum 40% of the frame, sharp and clearly visible.
-TEXT: All text on the image must be short, accurate and helpful. Step labels: max 4 words each. Feature callouts: max 3 words each. Section headlines: max 5 words. No walls of text.
-FOOTER: "printarelle.com · Mallow, Co. Cork, Ireland" in fine small tracked caps at the very bottom.
-TONE: Celebratory, clear, premium. Shows pride in craft and quality without being salesy.
-TYPOGRAPHY: Clean, modern, readable. Mix of weights for hierarchy. No decorative fonts that reduce readability.`;
-
-// 5 NEW PRODUCT INFO STYLES
-INFOG_STYLES.push(
-
-{id:"s21",name:"How To Gift It",sub:"Style 21 · 3-Step Instructions",styleTag:"Bold",ratio:"4:5",customRules:true,
-base:`A bright, clean instructional infographic at {SIZE} showing exactly how to use or gift this product. Pure white or very pale background. THREE numbered steps run down the LEFT side of the image, each step in a boldly numbered filled circle in the product's accent colour, a short verb headline (e.g. Write / Seal / Gift, or Open / Personalise / Surprise — matched to what this specific product actually requires), and one short sentence of description below. Thin dotted or solid lines or arrows connect each step visually to the relevant part of the product. The PRODUCT is large and centered in the right two-thirds of the image, sharp and clearly photographed. One small detail callout — a zoomed circle or inset — highlights the key interactive element of the product (the scratch circle, the personalised name, the foil detail). Footer: "Printarelle · Mallow, Co. Cork, Ireland · printarelle.com" in fine tracked small caps. Bright, joyful, instructional. No prices.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#f8f8f6"/><circle cx="22" cy="48" r="13" fill="#ccc"/><rect x="24" y="42" width="6" height="12" rx="1" fill="#fff"/><line x1="22" y1="61" x2="22" y2="80" stroke="#ddd" stroke-width="2" stroke-dasharray="3,2"/><rect x="38" y="40" width="60" height="7" rx="2" fill="#aaa"/><rect x="38" y="50" width="80" height="5" rx="1" fill="#ccc"/><circle cx="22" cy="98" r="13" fill="#ccc"/><rect x="24" y="92" width="6" height="12" rx="1" fill="#fff"/><line x1="22" y1="111" x2="22" y2="130" stroke="#ddd" stroke-width="2" stroke-dasharray="3,2"/><rect x="38" y="90" width="60" height="7" rx="2" fill="#aaa"/><rect x="38" y="100" width="80" height="5" rx="1" fill="#ccc"/><circle cx="22" cy="148" r="13" fill="#ccc"/><rect x="24" y="142" width="6" height="12" rx="1" fill="#fff"/><rect x="38" y="140" width="60" height="7" rx="2" fill="#aaa"/><rect x="38" y="150" width="80" height="5" rx="1" fill="#ccc"/><rect x="120" y="18" width="70" height="200" rx="6" fill="#d8d8d8"/><rect x="124" y="22" width="62" height="192" rx="4" fill="#c8c8c8"/><circle cx="155" cy="220" r="22" fill="none" stroke="#bbb" stroke-width="2"/><rect x="10" y="248" width="180" height="4" rx="1" fill="#ddd"/></svg>`},
-
-{id:"s22",name:"What's Included",sub:"Style 22 · Component Flat Lay",styleTag:"Minimal",ratio:"4:5",customRules:true,
-base:`A clean premium flat lay photograph at {SIZE} shot from directly above. Pure bright white background. THREE OR FOUR product components are laid out neatly with generous breathing space between them — the main product, an envelope, and any additional included items (a scratch sticker, a ribbon, a care card). Each component has a clean short label above or beside it — simple, like "1 x [Product Name]", "1 x White Envelope", "1 x Gold Scratch Sticker" — in a precise lightweight sans-serif. The layout feels considered and premium, not cluttered. One decorative accent element in a corner — a ribbon curl, small confetti — matches the product's colours without overwhelming the white space. Bottom area: a handmade-style fabric tag or stamp badge reading "Handmade in Ireland" with a small Printarelle mark. "printarelle.com" in fine small caps at the very bottom centre. Celebrates quality and completeness. No prices.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#ffffff"/><rect x="18" y="14" width="6" height="4" rx="1" fill="#ddd"/><rect x="18" y="20" width="80" height="100" rx="4" fill="#d8d8d8"/><rect x="20" y="22" width="76" height="96" rx="3" fill="#c8c8c8"/><rect x="30" y="9" width="56" height="8" rx="2" fill="#bbb"/><rect x="115" y="14" width="6" height="4" rx="1" fill="#ddd"/><rect x="108" y="20" width="70" height="100" rx="4" fill="#e8e8e6"/><rect x="112" y="22" width="62" height="96" rx="3" fill="#e0dfd8"/><rect x="118" y="9" width="50" height="8" rx="2" fill="#bbb"/><rect x="40" y="138" width="6" height="4" rx="1" fill="#ddd"/><circle cx="70" cy="175" r="32" fill="#d4c090"/><circle cx="70" cy="175" r="28" fill="#c8b080"/><rect x="36" y="133" width="68" height="8" rx="2" fill="#bbb"/><rect x="140" y="138" width="6" height="4" rx="1" fill="#ddd"/><rect x="122" y="135" width="60" height="80" rx="2" fill="#e8e8e4"/><path d="M122 155 L152 135 L182 155" fill="#ddd"/><rect x="124" y="133" width="52" height="8" rx="2" fill="#bbb"/><rect x="60" y="232" width="80" height="4" rx="1" fill="#ccc"/><rect x="72" y="238" width="56" height="3" rx="1" fill="#ddd"/></svg>`},
-
-{id:"s23",name:"Made For These Moments",sub:"Style 23 · Occasions Feature Grid",styleTag:"Soft",ratio:"4:5",customRules:true,
-base:`A clean editorial infographic at {SIZE}. Bright white or very pale background. LEFT THIRD: the product photograph — large, sharp, well-lit, at least 40% of the frame. Slightly angled or propped for dimension. RIGHT TWO-THIRDS: a bold headline of max 4 words about when this product is perfect (e.g. "Perfect For Every Occasion" or "Made For Life's Big Moments"). Below: a 2×2 GRID of four softly rounded square blocks, each a slightly tinted card containing ONE occasion name in bold and a simple clean line-art icon above it. Occasions are specific and relevant to this product (Birthday, Anniversary, Graduation, New Baby, etc.). Below the grid: 2 to 3 small horizontal feature rows, each with a tiny icon and a 2-3 word label (e.g. "Personalised", "Handmade in Ireland", "Next Day Dispatch"). Footer: "printarelle.com · Mallow, Co. Cork, Ireland" fine small caps. Bright, clean, informative. No prices.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#fafaf8"/><rect x="8" y="20" width="72" height="180" rx="4" fill="#d8d8d8"/><rect x="10" y="22" width="68" height="176" rx="3" fill="#c8c8c8"/><rect x="88" y="18" width="104" height="12" rx="3" fill="#aaa"/><rect x="88" y="33" width="90" height="8" rx="2" fill="#ccc"/><rect x="88" y="52" width="50" height="45" rx="5" fill="#e4e4e0"/><rect x="144" y="52" width="50" height="45" rx="5" fill="#e4e4e0"/><rect x="88" y="104" width="50" height="45" rx="5" fill="#e4e4e0"/><rect x="144" y="104" width="50" height="45" rx="5" fill="#e4e4e0"/><circle cx="113" cy="68" r="10" fill="#ccc"/><rect x="97" y="82" width="32" height="5" rx="1" fill="#bbb"/><circle cx="169" cy="68" r="10" fill="#ccc"/><rect x="153" y="82" width="32" height="5" rx="1" fill="#bbb"/><circle cx="113" cy="120" r="10" fill="#ccc"/><rect x="97" y="134" width="32" height="5" rx="1" fill="#bbb"/><circle cx="169" cy="120" r="10" fill="#ccc"/><rect x="153" y="134" width="32" height="5" rx="1" fill="#bbb"/><rect x="90" y="158" width="100" height="6" rx="2" fill="#ddd"/><rect x="90" y="168" width="100" height="6" rx="2" fill="#ddd"/><rect x="90" y="178" width="80" height="6" rx="2" fill="#ddd"/><rect x="40" y="248" width="120" height="4" rx="1" fill="#ccc"/></svg>`},
-
-{id:"s24",name:"The Reveal Moment",sub:"Style 24 · Person & Product",styleTag:"Photo",ratio:"4:5",customRules:true,
-base:`A warm, real lifestyle photograph at {SIZE}. A real person — shown from chest to hands only, wearing cosy neutral clothing — is actively interacting with the product in a natural, joyful way: opening an envelope, holding the card up, scratching a reveal circle, reading a message, or receiving it as a gift. The product is large and clearly visible — at least 40% of the frame — crisp and sharp while the background and person are natural and warm. The background is a soft-focus bright interior: clean walls, natural window light. ONE handwritten-style text annotation appears in the image pointing to a key feature of the product with a curved arrow — written as if a real person added it, not a designer badge (e.g. "their name, in real foil" or "scratch to reveal the surprise" or "personalised just for them"). Very bottom: "Printarelle · printarelle.com" in tiny fine-tracked type, barely visible. Bright, human, joyful. No commercial language.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#e8e4de"/><rect x="0" y="0" width="200" height="256" fill="#d8d4ce" opacity=".5"/><rect x="55" y="0" width="90" height="256" fill="#c8c4be" opacity=".3"/><rect x="30" y="120" width="140" height="100" rx="4" fill="#d8d5d0"/><rect x="50" y="60" width="100" height="130" rx="6" fill="#e4e0dc"/><rect x="54" y="64" width="92" height="122" rx="5" fill="#d8d4d0"/><rect x="10" y="150" width="50" height="30" rx="3" fill="#c8c4be" opacity=".6"/><rect x="140" y="145" width="50" height="30" rx="3" fill="#c8c4be" opacity=".6"/><rect x="25" y="80" width="40" height="60" rx="20" fill="#c8beb4" opacity=".7"/><rect x="135" y="80" width="40" height="60" rx="20" fill="#c8beb4" opacity=".7"/><rect x="14" y="52" width="70" height="10" rx="2" fill="#888" transform="rotate(-8 49 57)"/><path d="M80 65 Q100 75 105 90" fill="none" stroke="#888" stroke-width="1.5"/><rect x="60" y="244" width="80" height="4" rx="1" fill="#bbb"/></svg>`},
-
-{id:"s25",name:"Every Detail Matters",sub:"Style 25 · Feature Callout",styleTag:"Minimal",ratio:"4:5",customRules:true,
-base:`A bright premium product showcase infographic at {SIZE}. Pure white background. The product sits LARGE AND CENTERED at a slight angle for dimension — at least 55% of the frame, perfectly lit, razor sharp. Radiating outward from the product: THREE TO FOUR clean feature callout labels connected to specific parts of the product with thin precise dotted lines. Each callout sits in a small rounded pill or rectangle: max 3 words, describing a real quality feature of this product (e.g. "Real Foil Print", "350gsm Premium Card", "Personalised Name", "White Envelope Included", "Handmade in Cork"). ONE small circular badge overlaid on or near the product reads "Handmade in Ireland" or "Made in Cork" in small tracked caps. The overall layout is precise, airy and confident — like a premium brand product spec sheet. White space is generous. Footer: "printarelle.com · Mallow, Co. Cork, Ireland" in fine small caps. No prices. Celebrates craft and quality.`,
-svg:`<svg viewBox="0 0 200 256" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="256" fill="#ffffff"/><rect x="55" y="30" width="90" height="160" rx="5" fill="#d8d8d8" transform="rotate(3 100 110)"/><rect x="58" y="33" width="84" height="154" rx="4" fill="#c8c8c8" transform="rotate(3 100 110)"/><rect x="8" y="50" width="50" height="14" rx="7" fill="#e0e0dc"/><rect x="12" y="54" width="42" height="6" rx="2" fill="#bbb"/><line x1="58" y1="57" x2="60" y2="70" stroke="#ccc" stroke-width="1" stroke-dasharray="2,2"/><rect x="142" y="45" width="50" height="14" rx="7" fill="#e0e0dc"/><rect x="146" y="49" width="42" height="6" rx="2" fill="#bbb"/><line x1="142" y1="52" x2="138" y2="65" stroke="#ccc" stroke-width="1" stroke-dasharray="2,2"/><rect x="8" y="160" width="50" height="14" rx="7" fill="#e0e0dc"/><rect x="12" y="164" width="42" height="6" rx="2" fill="#bbb"/><line x1="58" y1="167" x2="60" y2="158" stroke="#ccc" stroke-width="1" stroke-dasharray="2,2"/><rect x="142" y="155" width="50" height="14" rx="7" fill="#e0e0dc"/><rect x="146" y="159" width="42" height="6" rx="2" fill="#bbb"/><line x1="142" y1="162" x2="138" y2="158" stroke="#ccc" stroke-width="1" stroke-dasharray="2,2"/><circle cx="148" cy="42" r="16" fill="#e8e8e4"/><circle cx="148" cy="42" r="13" fill="none" stroke="#ccc" stroke-width="1.5"/><rect x="60" y="248" width="80" height="4" rx="1" fill="#ccc"/></svg>`}
-
-);
-const INFOG_RULES = `
-
-ABSOLUTE COLOUR RULE: NEVER specify or hardcode any colours anywhere in this prompt. No background colours, no text colours, no prop colours, no surface colours, no accent tones. ALL colours in the generated image must be derived entirely from the product design visible in the uploaded reference image. The scene, background, typography and props should all feel like they belong to the same colour world as the product itself.
-
-ENVELOPE RULE: If an envelope appears in the scene it must be either plain white, natural unbleached kraft, or absent entirely. NEVER a coloured envelope — no navy, no black, no dark tones, no coloured lining. If unsure, omit the envelope.
-
-BACKGROUND RULE: Always bright, clean and light. Never dark, never moody, never dramatic. The background supports the product — it never competes with it or overwhelms it.
-
-TEXT ON IMAGE: Absolute maximum 3 short lines visible in the final image. Hero headline: max 8 words, emotional and human, not a product title or feature list. One optional supporting line: max 6 words. One tiny credit: "printarelle.com" in fine tracked caps barely visible at the bottom. Nothing else. No icon rows, no feature lists, no badge clusters, no CTA buttons, no prices.
-
-EMOTIONAL INTENT: The image must make someone stop scrolling and feel something — not "here is a product for sale". Lead with the human moment: the occasion, the feeling, the person receiving it.
-
-PHOTOGRAPHY STYLE: Soft natural light. Real surfaces that complement the product's own colour palette. Props must be occasion-appropriate and minimal — they must make sense for the specific product and event. NEVER use the same prop across different occasions. A Debs card does not share props with a boxing ticket. A Communion card does not share props with a birthday card.
-
-TYPOGRAPHY: Max 2 font styles. Size and weight contrast create hierarchy — not badges, borders or icons. Text looks hand-chosen by a designer.
-
-OUTPUT: Describe a photograph with minimal text overlay. The image does the emotional heavy lifting. The words whisper, they do not shout.`;
-
-const TAGC = {brand:["#F4E8CC","#8A6516"],occasion:["#F6E1E4","#A14E5A"],niche:["#E4EDE3","#54724F"],community:["#EAE4F2","#6B5694"],trending:["#FBEBD6","#A4641B"]};
-
-// ============ STATE ============
-let goal="awareness", active=PLATFORMS.filter(p=>p.def).map(p=>p.id);
-let selectedStyles=[], selectedSizes=["4:5"], previewStyle=null, pack=null, packMeta=null, busy=false;
-
-// ============ SETTINGS ============
-function loadSettings(){
-  document.getElementById("apiKey").value = localStorage.getItem("pce_key")||"";
-  document.getElementById("shopDomainInput").value = localStorage.getItem("pce_shop_domain")||"rpmffu-te.myshopify.com";
-  renderBufferChannels();
+/* ==================== STATE & HELPERS ==================== */
+const $ = id => document.getElementById(id);
+let state = {
+  products: JSON.parse(localStorage.getItem('pcb_products')||'[]'),
+  selected: null, goal:"Sales", occ:"", plats: PLATFORMS.filter(p=>p.def).map(p=>p.id),
+  model: localStorage.getItem('pcb_model')||'best',
+  strategy: null, pack: null,
+  cal: JSON.parse(localStorage.getItem('pcb_cal')||'{}'),
+  hist: JSON.parse(localStorage.getItem('pcb_hist')||'[]'),
+  day:"Monday", hookP:"All", hookS:"All",
+  myHooks: JSON.parse(localStorage.getItem('pcb_hooks')||'[]')
+};
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function sanitise(s){
+  if(!s) return s;
+  return String(s).replace(/\s*[\u2014\u2013]\s*/g, ', ').replace(/,\s*,/g,',').replace(/:\s*,/g,':').replace(/,\s*\./g,'.');
 }
+function deepSanitise(o){
+  if(typeof o==='string') return sanitise(o);
+  if(Array.isArray(o)) return o.map(deepSanitise);
+  if(o && typeof o==='object'){const r={};for(const k in o)r[k]=deepSanitise(o[k]);return r}
+  return o;
+}
+function copyText(txt, btn){
+  navigator.clipboard.writeText(txt).then(()=>{
+    const old=btn.textContent; btn.textContent='Copied \u2713'; btn.classList.add('done');
+    setTimeout(()=>{btn.textContent=old;btn.classList.remove('done')},1600);
+  }).catch(()=>toast('Copy failed, long-press the text instead'));
+}
+function showError(msg){$('errorBox').innerHTML='<div class="error">'+esc(msg)+'</div>'}
+function clearError(){$('errorBox').innerHTML=''}
+
+/* ==================== SETTINGS ==================== */
 function saveSettings(){
-  localStorage.setItem("pce_key", document.getElementById("apiKey").value.trim());
-  const dom = document.getElementById("shopDomainInput").value.trim().replace(/^https?:\/\//,"").replace(/\/.*$/,"");
-  if(dom) localStorage.setItem("pce_shop_domain", dom);
-  refreshStatus();
-  document.getElementById("settings").removeAttribute("open");
+  localStorage.setItem('pcb_key', $('apiKey').value.trim());
+  localStorage.setItem('pcb_shop', $('shopDomain').value.trim().replace(/^https?:\/\//,'').replace(/\/.*$/,''));
+  localStorage.setItem('pcb_model', state.model);
+  updateSetStatus(); toast('Settings saved');
 }
-function refreshStatus(){
-  const k = localStorage.getItem("pce_key");
-  document.getElementById("setStatus").innerHTML = k
-    ? '<span class="dot ok-dot"></span>ready'
-    : '<span class="dot no-dot"></span>add your API key';
+function updateSetStatus(){
+  const k=localStorage.getItem('pcb_key'), s=localStorage.getItem('pcb_shop');
+  $('setStatus').textContent = (k?'key \u2713':'key needed') + (s?' \u00b7 shop \u2713':'');
+}
+function renderModelChips(){
+  $('modelChips').innerHTML = ['best','fast'].map(m=>
+    '<button class="chip '+(state.model===m?'on':'')+'" onclick="state.model=\''+m+'\';renderModelChips();saveSettings()">'+(m==='best'?'Best (Sonnet)':'Fast (Haiku)')+'</button>').join('');
 }
 
-// ============ BUFFER ============
-const BUFFER_PLATFORMS = ["instagram","facebook","pinterest"];
-const BUFFER_LABELS = {instagram:"Instagram",facebook:"Facebook",pinterest:"Pinterest"};
-
-async function loadBufferChannels(){
-  const btn = document.getElementById("loadChBtn");
-  btn.textContent="Loading..."; btn.disabled=true;
+/* ==================== SHOPIFY PRODUCTS ==================== */
+async function loadProducts(force){
+  const dom = localStorage.getItem('pcb_shop');
+  if(!dom){$('prodHint').textContent='Add your store domain in Settings first.';return}
+  if(state.products.length && !force){renderProducts(state.products);return}
+  $('prodHint').textContent='Loading products from '+dom+'...';
   try{
-    const res = await fetch("/api/buffer-post",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({action:"profiles"})
-    });
-    const data = await res.json();
-    if(!res.ok||data.error) throw new Error(data.error||"Failed to load channels");
-    localStorage.setItem("pce_buffer_profiles", JSON.stringify(data.profiles));
-    renderBufferChannels();
-  }catch(e){
-    document.getElementById("bufferChannels").innerHTML='<div class="error" style="display:block">'+esc(e.message)+'</div>';
-  }
-  btn.textContent="Reload channels"; btn.disabled=false;
-}
-
-function renderBufferChannels(){
-  const box = document.getElementById("bufferChannels");
-  if(!box) return;
-  const profiles = JSON.parse(localStorage.getItem("pce_buffer_profiles")||"[]");
-  if(!profiles.length){ box.innerHTML=""; return; }
-  const saved = JSON.parse(localStorage.getItem("pce_buffer_ids")||"{}");
-  let html = '<div class="secthead" style="margin-top:10px">Map your channels</div>';
-  BUFFER_PLATFORMS.forEach(plat=>{
-    const options = profiles.map(p=>`<option value="${p.id}" ${saved[plat]===p.id?"selected":""}>${p.service} — ${p.username}</option>`).join("");
-    html += `<div style="margin-bottom:8px"><label class="hint" style="display:block;margin-bottom:4px">${BUFFER_LABELS[plat]}</label>
-      <select onchange="saveBufferMapping('${plat}',this.value)" style="font-family:'Lora',serif;width:100%;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--cream);font-size:13px">
-        <option value="">— Skip this platform —</option>${options}
-      </select></div>`;
-  });
-  html += '<div class="note" style="margin-top:6px">✓ Mapped. Tap Save all settings.</div>';
-  box.innerHTML = html;
-}
-
-function saveBufferMapping(platform, profileId){
-  const ids = JSON.parse(localStorage.getItem("pce_buffer_ids")||"{}");
-  if(profileId) ids[platform]=profileId; else delete ids[platform];
-  localStorage.setItem("pce_buffer_ids", JSON.stringify(ids));
-}
-
-async function publishToBuffer(){
-  const ids = JSON.parse(localStorage.getItem("pce_buffer_ids")||"{}");
-  if(!Object.keys(ids).length){ alert("Map your Buffer channels in Settings first."); return; }
-  if(!pack) return;
-  const btn = document.getElementById("bufferBtn");
-  btn.disabled=true; btn.textContent="Publishing...";
-  const statusBox = document.getElementById("bufferStatus");
-  statusBox.innerHTML=""; statusBox.style.display="block";
-  const imageUrlInput = document.getElementById("pubImageUrl");
-  const imageUrl = imageUrlInput ? imageUrlInput.value.trim() : (selectedProduct?.image||null);
-  const payload = {
-    action:"publish", profileIds:ids,
-    imageUrl: imageUrl||null,
-    platforms:{}
-  };
-  BUFFER_PLATFORMS.forEach(p=>{ if(pack[p]&&!pack[p].error) payload.platforms[p]=pack[p]; });
-  try{
-    const res = await fetch("/api/buffer-post",{
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if(!res.ok||data.error) throw new Error(data.error||"Publishing failed");
-    const r = data.results||{};
-    let html="";
-    if(r.instagram) html+=statusLine("Instagram",r.instagram);
-    if(r.facebook)  html+=statusLine("Facebook",r.facebook);
-    if(r.pinterest&&Array.isArray(r.pinterest)){
-      const ok=r.pinterest.filter(x=>x.success).length;
-      html+=statusLine("Pinterest ("+ok+"/"+r.pinterest.length+" pins)", ok===r.pinterest.length?{success:true}:{error:ok+" of "+r.pinterest.length+" queued"});
+    let data=null;
+    try{
+      const r = await fetch('https://'+dom+'/products.json?limit=250');
+      if(r.ok) data = await r.json();
+    }catch(e){}
+    if(!data){
+      const r2 = await fetch('/api/shopify?domain='+encodeURIComponent(dom));
+      if(!r2.ok) throw new Error('Could not reach the store');
+      data = await r2.json();
     }
-    statusBox.innerHTML=html||'<div style="font-size:13px;color:var(--inksoft)">Nothing was mapped to publish.</div>';
+    state.products = (data.products||[]).map(p=>({
+      title:p.title, type:p.product_type||'', desc:(p.body_html||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,300),
+      img:(p.images&&p.images[0]&&p.images[0].src)||'', handle:p.handle
+    }));
+    localStorage.setItem('pcb_products', JSON.stringify(state.products));
+    $('prodHint').textContent=state.products.length+' products loaded. Search above or tap one.';
+    renderProducts(state.products.slice(0,6)); renderHookProducts();
   }catch(e){
-    statusBox.innerHTML='<div style="color:var(--rose);font-size:13px">❌ '+esc(e.message)+'</div>';
+    $('prodHint').textContent='Could not load products. Check the domain, or type the product manually below.';
   }
-  btn.disabled=false; btn.textContent="🚀 Publish to Buffer";
+}
+function filterProducts(){
+  const q=$('prodQuery').value.trim().toLowerCase();
+  if(!q){renderProducts(state.products.slice(0,6));return}
+  renderProducts(state.products.filter(p=>(p.title+' '+p.type).toLowerCase().includes(q)).slice(0,8));
+}
+function renderProducts(list){
+  $('prodResults').innerHTML = list.map((p,i)=>{
+    const idx = state.products.indexOf(p);
+    const sel = state.selected && state.selected.handle===p.handle;
+    return '<div class="prodrow '+(sel?'selprod':'')+'" onclick="selectProduct('+idx+')">'+
+      (p.img?'<img src="'+esc(p.img)+'" alt="">':'<div style="width:48px;height:48px;border-radius:9px;background:var(--gold-pale);flex-shrink:0"></div>')+
+      '<div style="min-width:0"><div class="t">'+esc(p.title)+'</div><div class="d">'+esc(p.desc.slice(0,80))+'</div></div></div>';
+  }).join('');
+}
+function selectProduct(i){
+  state.selected = state.products[i];
+  $('manualProduct').value=''; filterProducts(); toast('Selected: '+state.selected.title);
+}
+function currentProduct(){
+  const manual=$('manualProduct').value.trim();
+  if(manual) return {title:manual, desc:$('manualDetail').value.trim(), img:'', manual:true};
+  return state.selected;
 }
 
-function statusLine(name,result){
-  return result.success
-    ? `<div style="font-size:13px;color:var(--sage);margin-bottom:4px">✓ ${name} queued in Buffer</div>`
-    : `<div style="font-size:13px;color:var(--rose);margin-bottom:4px">✗ ${name}: ${esc(result.error||"error")}</div>`;
+/* ==================== BRIEF CHIPS ==================== */
+function renderBrief(){
+  $('goalChips').innerHTML = GOALS.map(g=>'<button class="chip '+(state.goal===g?'on':'')+'" onclick="state.goal=\''+g+'\';renderBrief()">'+g+'</button>').join('');
+  $('occChips').innerHTML = OCCS.map(o=>'<button class="chip '+(state.occ===o?'pinkon':'')+'" onclick="state.occ=(state.occ===\''+o+'\'?\'\':\''+o+'\');renderBrief()">'+o+'</button>').join('');
+  $('platChips').innerHTML = PLATFORMS.map(p=>'<button class="chip '+(state.plats.includes(p.id)?'on':'')+'" onclick="togglePlat(\''+p.id+'\')">'+p.name+'</button>').join('');
 }
-
-function renderPublishBuffer(){
-  const w=document.getElementById("publishWrap"); w.innerHTML="";
-  if(!pack||!Object.keys(pack).length) return;
-  const ids=JSON.parse(localStorage.getItem("pce_buffer_ids")||"{}");
-  const card=document.createElement("div"); card.className="card";
-  if(Object.keys(ids).length>0){
-    const mapped=Object.keys(ids).map(p=>BUFFER_LABELS[p]).join(", ");
-    const hasShopImg = selectedProduct?.image;
-    card.innerHTML=`<h2>3 · Publish</h2>
-      <div class="hint">Queues ${mapped} in Buffer. Instagram requires an image.</div>
-      <div class="secthead">Post image</div>
-      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap">
-        <div id="pubImgPreviewWrap" style="${hasShopImg?'display:flex':'display:none'};align-items:center;gap:8px">
-          <img id="pubImgPreview" src="${hasShopImg?selectedProduct.image:''}" style="width:56px;height:56px;border-radius:10px;object-fit:cover;border:1px solid var(--line)">
-          <button class="chip" onclick="clearPubImage()" style="font-size:11px;padding:5px 10px">Remove</button>
-        </div>
-        <div style="flex:1;min-width:180px">
-          <label class="btn3" style="display:inline-block;cursor:pointer;margin-bottom:6px;text-align:center;width:auto;padding:10px 18px">
-            📁 Upload image from device
-            <input type="file" id="pubImgFile" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
-          </label>
-          <div class="hint" style="margin:0">Or paste a public image URL:</div>
-          <input id="pubImageUrl" type="url" placeholder="https://yourimage.com/photo.jpg" value="${hasShopImg?selectedProduct.image:''}" style="margin-top:4px">
-          <div id="uploadStatus" style="font-size:12px;color:var(--sage);display:none;margin-top:4px"></div>
-        </div>
-      </div>
-      <button class="btn3" id="bufferBtn" onclick="publishToBuffer()">🚀 Publish to Buffer</button>
-      <div id="bufferStatus" style="display:none;margin-top:10px"></div>`;
-  }else{
-    card.innerHTML=`<h2>3 · Publish</h2>
-      <div class="hint">Add your Buffer Personal Key to Vercel env vars, then Load channels in Settings to enable one-tap publishing.</div>`;
-  }
-  w.appendChild(card);
+function togglePlat(id){
+  state.plats = state.plats.includes(id) ? state.plats.filter(x=>x!==id) : [...state.plats,id];
+  renderBrief();
 }
+function briefOccasion(){ return $('occOther').value.trim() || (state.occ==='None'?'':state.occ); }
 
-function clearPubImage(){
-  document.getElementById("pubImageUrl").value="";
-  document.getElementById("pubImgPreview").src="";
-  document.getElementById("pubImgPreviewWrap").style.display="none";
-}
-
-async function handleImageUpload(input){
-  const file = input.files[0];
-  if(!file) return;
-  const status = document.getElementById("uploadStatus");
-  status.textContent="Uploading..."; status.style.display="block"; status.style.color="var(--inksoft)";
-
-  // Resize image in browser before uploading
-  const base64 = await new Promise((resolve)=>{
-    const img = new Image();
-    img.onload = ()=>{
-      const max = 1200;
-      const scale = Math.min(1, max/Math.max(img.width, img.height));
-      const cv = document.createElement("canvas");
-      cv.width = Math.round(img.width*scale);
-      cv.height = Math.round(img.height*scale);
-      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
-      resolve(cv.toDataURL("image/jpeg", 0.9));
-    };
-    img.src = URL.createObjectURL(file);
+/* ==================== CLAUDE CALL ==================== */
+async function callClaude(system, user, maxTokens){
+  const key = localStorage.getItem('pcb_key');
+  if(!key) throw new Error('Add your Anthropic API key in Settings first.');
+  const r = await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':key,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body: JSON.stringify({model: MODELS[state.model], max_tokens:maxTokens||3000, system, messages:[{role:'user',content:user}]})
   });
+  if(!r.ok){
+    const err = await r.json().catch(()=>({}));
+    throw new Error(err.error?.message || 'API error '+r.status+'. Check your key and credit at console.anthropic.com.');
+  }
+  const data = await r.json();
+  const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+  const clean = text.replace(/```json|```/g,'').trim();
+  const m = clean.match(/\{[\s\S]*\}/);
+  return JSON.parse(m?m[0]:clean);
+}
 
+/* ==================== STAGE 1: THE STRATEGY BRAIN ==================== */
+async function runStrategy(steer){
+  clearError();
+  const prod = currentProduct();
+  if(!prod){showError('Pick a product from Shopify or type one manually first.');return}
+  if(!state.plats.length){showError('Pick at least one platform.');return}
+  const btn=$('thinkBtn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span>Thinking...';
+  $('packBox').innerHTML='';
   try{
-    const res = await fetch("/api/upload-image",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ image: base64 })
-    });
-    const data = await res.json();
-    if(!res.ok||data.error) throw new Error(data.error||"Upload failed");
+    const fmts = FORMATS.filter(f=>f.p.some(p=>state.plats.includes(p)))
+      .map(f=>f.n+': '+f.d+' (suits: '+f.p.join(', ')+')').join('\n');
+    const sys = BRAND + '\nYou are the content strategist. You think before anyone writes a word. You respond ONLY with valid JSON, no preamble, no markdown fences.';
+    const user = `Plan the single strongest content angle for this brief, then choose the best 2026 format for each platform from the proven library below. Think about what earns saves, shares, and completed watches for THIS product specifically.
 
-    // Show preview and fill URL
-    document.getElementById("pubImageUrl").value = data.url;
-    const preview = document.getElementById("pubImgPreview");
-    const previewWrap = document.getElementById("pubImgPreviewWrap");
-    preview.src = data.url;
-    previewWrap.style.display="flex";
-    status.textContent="✓ Uploaded successfully";
-    status.style.color="var(--sage)";
-  }catch(e){
-    status.textContent="❌ "+e.message;
-    status.style.color="var(--rose)";
-  }
+PRODUCT: ${prod.title}
+DETAILS: ${prod.desc||'none given'}
+GOAL: ${state.goal}
+OCCASION: ${briefOccasion()||'none, evergreen'}
+PLATFORMS: ${state.plats.join(', ')}
+EXTRA CONTEXT FROM NATALI: ${$('briefExtra').value.trim()||'none'}
+${steer?('STEER FROM NATALI, FOLLOW THIS: '+steer):''}
+
+PROVEN 2026 FORMAT LIBRARY:
+${fmts}
+
+Respond with ONLY this JSON:
+{
+ "angle": "the one big idea in one sentence",
+ "emotionalCore": "the feeling this content must create, one sentence",
+ "searchPhrase": "the exact phrase a customer would type to find this",
+ "whyThisWins": "2-3 sentences of honest strategic reasoning referencing 2026 signals",
+ "platforms": {
+   ${state.plats.map(p=>'"'+p+'": {"format":"name from library","concept":"one sentence, what the post actually is","hook":"the exact opening line or on-screen text"}').join(',\n   ')}
+ }
+}`;
+    state.strategy = deepSanitise(await callClaude(sys, user, 1800));
+    renderStrategy();
+  }catch(e){ showError(e.message); }
+  btn.disabled=false; btn.textContent='Think first';
 }
 
-// ============ SHOPIFY PRODUCT SEARCH (no token needed) ============
-let allProducts = [];
-let selectedProduct = null;
-
-function getShop(){
-  return localStorage.getItem("pce_shop_domain") || "rpmffu-te.myshopify.com";
+function renderStrategy(){
+  const s=state.strategy; if(!s) return;
+  const platRows = Object.entries(s.platforms||{}).map(([id,p])=>{
+    const pl=PLATFORMS.find(x=>x.id===id); if(!pl)return'';
+    return '<div class="thinkrow"><span class="ic">\u25C6</span><div><b>'+pl.name+':</b> '+esc(p.format)+', '+esc(p.concept)+'<br><i style="color:var(--ink-soft)">Hook: '+esc(p.hook)+'</i></div></div>';
+  }).join('');
+  $('strategyBox').innerHTML = `
+  <div class="card thinkcard">
+    <h2>\u2726 Here is my thinking</h2>
+    <div class="thinkrow"><span class="ic">\u2726</span><div><b>The angle:</b> ${esc(s.angle)}</div></div>
+    <div class="thinkrow"><span class="ic">\u2665</span><div><b>The feeling:</b> ${esc(s.emotionalCore)}</div></div>
+    <div class="thinkrow"><span class="ic">\u2315</span><div><b>They search:</b> "${esc(s.searchPhrase)}"</div></div>
+    <div class="thinkrow"><span class="ic">\u2713</span><div><b>Why this wins:</b> ${esc(s.whyThisWins)}</div></div>
+    ${platRows}
+    <label>Not quite right? Steer me</label>
+    <input type="text" id="steerInput" placeholder="e.g. make it about the mam, not the couple">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost small" onclick="runStrategy($('steerInput').value.trim())">Think again</button>
+      <button class="btn small" id="writeBtn" onclick="writePack()">Write the pack</button>
+    </div>
+  </div>`;
+  $('strategyBox').scrollIntoView({behavior:'smooth'});
 }
 
-function refreshProducts(){
-  // Clear ALL product cache keys regardless of domain
-  Object.keys(localStorage)
-    .filter(k => k.startsWith("pce_products"))
-    .forEach(k => localStorage.removeItem(k));
-  allProducts = [];
-  document.getElementById("shopResults").innerHTML = "";
-  clearProduct();
-  loadAllProducts();
-}
-
-async function loadAllProducts(){
-  const shop = getShop();
-  const cacheKey = "pce_products_"+shop;
-  const tsKey = "pce_products_ts_"+shop;
-  const cached = localStorage.getItem(cacheKey);
-  const cachedAt = localStorage.getItem(tsKey);
-  const oneDay = 24*60*60*1000;
-  if(cached && cachedAt && (Date.now()-parseInt(cachedAt)) < oneDay){
-    allProducts = JSON.parse(cached);
-    const hint = document.getElementById("shopHint");
-    if(hint) hint.textContent = allProducts.length+" products loaded. Type to search.";
-    return;
-  }
-  const hint = document.getElementById("shopHint");
-  if(hint) hint.textContent = "Loading all products from "+shop+"...";
-  allProducts = [];
-  let page = 1;
-  while(true){
-    try{
-      const res = await fetch("https://"+shop+"/products.json?limit=250&page="+page);
-      if(!res.ok){
-        if(hint) hint.textContent = "Store returned "+res.status+". Check your store domain in Settings.";
-        break;
-      }
-      const data = await res.json();
-      const batch = (data.products||[]).map(p=>({
-        title: p.title,
-        desc: (p.body_html||"").replace(/<[^>]+>/g,"").slice(0,300),
-        price: p.variants&&p.variants[0] ? "\u20ac"+p.variants[0].price : "",
-        image: p.images&&p.images[0] ? p.images[0].src : null,
-        type: p.product_type||""
-      }));
-      allProducts = allProducts.concat(batch);
-      if(hint) hint.textContent = "Loading... "+allProducts.length+" products so far.";
-      if(batch.length < 250) break;
-      page++;
-    }catch(e){
-      if(hint) hint.textContent = "Could not load products: "+e.message;
-      break;
-    }
-  }
-  if(allProducts.length > 0){
-    try{
-      localStorage.setItem(cacheKey, JSON.stringify(allProducts));
-      localStorage.setItem(tsKey, Date.now().toString());
-    }catch(e){ /* storage full, skip cache */ }
-    if(hint) hint.textContent = "\u2713 "+allProducts.length+" products loaded. Type to search.";
-  }
-}
-
-function searchProducts(){
-  const q = document.getElementById("shopQuery").value.trim().toLowerCase();
-  const hint = document.getElementById("shopHint");
-  const box = document.getElementById("shopResults");
-  box.innerHTML="";
-  if(!q){ hint.textContent="Type a product name above."; return; }
-  if(!allProducts.length){ hint.textContent="Still loading products, try again in a moment."; return; }
-  const matches = allProducts.filter(p=>
-    p.title.toLowerCase().includes(q) ||
-    (p.type && p.type.toLowerCase().includes(q))
-  ).slice(0,10);
-  if(!matches.length){
-    hint.textContent="No results for \'"+q+"\'. Try: topper, print, card, scratch, foil, ticket.";
-    return;
-  }
-  hint.textContent=matches.length+" match"+(matches.length!==1?"es":"")+" — tap to select:";
-  matches.forEach(p=>{
-    const btn=document.createElement("button");
-    btn.className="chip";
-    btn.style.cssText="display:flex;align-items:center;gap:10px;text-align:left;padding:10px 14px;width:100%;max-width:100%";
-    const typeTag = p.type ? '<span style="font-size:10px;background:var(--goldsoft);color:var(--ink);padding:2px 7px;border-radius:8px;margin-left:4px">'+esc(p.type)+'</span>' : '';
-    btn.innerHTML=(p.image?'<img src="'+p.image+'" style="width:40px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0">':'')+ '<div><div style="font-weight:600;font-size:13px">'+esc(p.title)+typeTag+'</div>'+ (p.price?'<div style="font-size:11px;color:var(--gold);margin-top:2px">'+esc(p.price)+'</div>':'')+'</div>';
-    btn.onclick=()=>selectProduct(p);
-    box.appendChild(btn);
-  });
-}
-
-function selectProduct(p){
-  selectedProduct = p;
-  document.getElementById("shopResults").innerHTML="";
-  document.getElementById("shopHint").textContent="";
-  document.getElementById("shopQuery").value="";
-  const wrap = document.getElementById("selectedProduct");
-  wrap.style.display="block";
-  document.getElementById("selTitle").textContent=p.title;
-  document.getElementById("selDesc").textContent=p.desc||"Handmade personalised product by Printarelle";
-  const img = document.getElementById("selImg");
-  if(p.image){ img.src=p.image; img.style.display="block"; }
-  else { img.style.display="none"; }
-}
-
-function clearProduct(){
-  selectedProduct=null;
-  document.getElementById("selectedProduct").style.display="none";
-  document.getElementById("shopQuery").value="";
-  document.getElementById("shopHint").textContent="";
-  document.getElementById("shopResults").innerHTML="";
-}
-
-// ============ API ============
-async function callClaude(prompt){
-  const key = localStorage.getItem("pce_key");
-  if(!key) throw new Error("Add your API key in Settings first.");
-  const controller = new AbortController();
-  const timer = setTimeout(()=>controller.abort(), 60000);
-  let res;
+/* ==================== STAGE 2: WRITE THE PACK ==================== */
+async function writePack(){
+  clearError();
+  const prod=currentProduct(), s=state.strategy;
+  const btn=$('writeBtn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span>Writing...';
   try{
-    res = await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "x-api-key":key,
-        "anthropic-version":"2023-06-01",
-        "anthropic-dangerous-direct-browser-access":"true"
-      },
-      body:JSON.stringify({model:MODEL,max_tokens:1500,messages:[{role:"user",content:prompt}]}),
-      signal:controller.signal
-    });
-  }catch(e){
-    clearTimeout(timer);
-    if(e.name==="AbortError") throw new Error("Timed out after 60 seconds. Try again.");
-    throw new Error("Network error. Check your connection.");
-  }
-  clearTimeout(timer);
-  if(!res.ok){
-    if(res.status===401) throw new Error("API key not accepted. Check it in Settings.");
-    if(res.status===429) throw new Error("Rate limit hit. Wait a moment and try again.");
-    throw new Error("API error ("+res.status+").");
-  }
-  const data = await res.json();
-  const text = (data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
-  const clean = text.replace(/```json|```/g,"").trim();
-  const a=clean.indexOf("{"), b=clean.lastIndexOf("}");
-  if(a===-1||b===-1) throw new Error("Unexpected response, try again.");
-  return JSON.parse(clean.slice(a,b+1));
-}
-
-// ============ UI BUILDERS ============
-function chip(label, on, fn, dark){
-  const b=document.createElement("button");
-  b.className="chip"+(on?" on":"")+(dark?" dark":"");
-  b.textContent=label; b.onclick=fn; return b;
-}
-function renderChips(){
-  const g=document.getElementById("goalChips"); g.innerHTML="";
-  ["awareness","sales","engagement"].forEach(x=>g.appendChild(chip(x[0].toUpperCase()+x.slice(1), goal===x, ()=>{goal=x;renderChips();})));
-  const p=document.getElementById("platChips"); p.innerHTML="";
-  PLATFORMS.forEach(x=>p.appendChild(chip(x.emoji+" "+x.name, active.includes(x.id), ()=>{
-    active = active.includes(x.id)? active.filter(a=>a!==x.id):[...active,x.id]; renderChips();
-  })));
-
-  // Style chips — multi-select, tap to toggle + show preview
-  const s=document.getElementById("styleChips"); s.innerHTML="";
-  const selCount = selectedStyles.length;
-  if(selCount>0){
-    const clearBtn=document.createElement("button");
-    clearBtn.className="chip"; clearBtn.style.cssText="border-color:var(--rose);color:var(--rose)";
-    clearBtn.textContent="Clear ("+selCount+" selected)";
-    clearBtn.onclick=()=>{selectedStyles=[];previewStyle=null;renderChips();};
-    s.appendChild(clearBtn);
-  }
-  INFOG_STYLES.forEach(x=>{
-    const isOn=selectedStyles.includes(x.id);
-    const isPrev=previewStyle===x.id;
-    const b=document.createElement("button");
-    b.className="chip"+(isOn?" on":"")+(isPrev?" dark":"");
-    b.textContent=(isOn?"✓ ":"")+x.name;
-    b.onclick=()=>{
-      if(selectedStyles.includes(x.id)){
-        selectedStyles=selectedStyles.filter(i=>i!==x.id);
-        if(previewStyle===x.id) previewStyle=selectedStyles[0]||null;
-      } else {
-        selectedStyles=[...selectedStyles,x.id];
-        previewStyle=x.id;
-      }
-      renderChips();
-    };
-    s.appendChild(b);
-  });
-
-  // Preview panel
-  const prev=document.getElementById("stylePreview");
-  if(selectedStyles.length>0){
-    const st=INFOG_STYLES.find(x=>x.id===(previewStyle||selectedStyles[0]));
-    prev.style.display="block";
-    document.getElementById("previewLabel").textContent=
-      (selectedStyles.length===1 ? st.name+" · "+st.sub : selectedStyles.length+" styles selected — tap any to preview");
-    document.getElementById("previewSvgWrap").innerHTML=st?st.svg:"";
-
-    // Size chips — multi-select
-    const z=document.getElementById("sizeChips"); z.innerHTML="";
-    const sizeLabel=document.createElement("div");
-    sizeLabel.style.cssText="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);width:100%;margin-bottom:4px";
-    sizeLabel.textContent="Sizes (pick one or more)";
-    z.appendChild(sizeLabel);
-    SIZES.forEach(x=>{
-      const isOn=selectedSizes.includes(x.id);
-      const b=document.createElement("button");
-      b.className="chip"+(isOn?" dark":"");
-      b.textContent=(isOn?"✓ ":"")+x.label+" · "+x.px;
-      b.onclick=()=>{
-        selectedSizes=isOn? (selectedSizes.length>1? selectedSizes.filter(s=>s!==x.id) : selectedSizes) : [...selectedSizes,x.id];
-        renderChips();
-      };
-      z.appendChild(b);
-    });
-
-    const countNote=document.createElement("div");
-    countNote.style.cssText="font-size:11px;color:var(--inksoft);margin-top:4px;width:100%";
-    const total=selectedStyles.length * selectedSizes.length;
-    countNote.textContent="→ Will generate "+total+" infographic prompt"+(total!==1?"s":"")+" ("+selectedStyles.length+" style"+(selectedStyles.length!==1?"s":"")+
-      " × "+selectedSizes.length+" size"+(selectedSizes.length!==1?"s":"")+")" ;
-    z.appendChild(countNote);
-  } else {
-    prev.style.display="none";
-  }
-}
-
-// ============ GENERATE ============
-async function generatePack(){
-  if(busy) return;
-  if(!selectedProduct){ showError("Search and select a product first."); return; }
-  const title = selectedProduct.title;
-  const desc = selectedProduct.desc || "Handmade personalised product by Printarelle, Cork Ireland";
-  const occ = document.getElementById("occasion").value.trim() || "general gifting";
-  if(active.length===0){ showError("Pick at least one platform."); return; }
-
-  busy=true; showError(""); pack={}; packMeta={title,desc,occ,goal,ts:Date.now()};
-  document.getElementById("results").innerHTML="";
-  document.getElementById("publishWrap").innerHTML="";
-  const btn=document.getElementById("genBtn"); btn.disabled=true;
-
-  for(const pid of active){
-    btn.textContent="Writing "+PLATFORMS.find(p=>p.id===pid).name+"…";
-    const isPinterest = pid==="pinterest";
-    const extra = pid==="tiktok" ? `"onScreenText":"max 8 words","spokenKeywords":["phrase 1","phrase 2","phrase 3"],` : "";
-    const pinterestJson = `{"pins":[{"title":"pin 1 title max 100 chars","description":"pin 1 description max 230 chars","altText":"max 125 chars"},{"title":"pin 2 title max 100 chars","description":"pin 2 description max 230 chars","altText":"max 125 chars"},{"title":"pin 3 title max 100 chars","description":"pin 3 description max 230 chars","altText":"max 125 chars"}],"postingNotes":"one short practical posting note for Pinterest"}`;
-    const standardJson = `{"caption":"full paste-ready caption with hashtags at end",${extra}"altText":"max 125 chars — describe what is in the image, include product name and occasion, written for accessibility","hashtags":[{"tag":"#Example","type":"brand|occasion|niche|community|trending"}],"videoHook":"specific guidance for the first 3 seconds","postingNotes":"one short practical posting note for this platform"}`;
-    try{
-      pack[pid]=await callClaude(
-        BRAND+"\n\nSTRICT RULE: Use ONLY the product name and details provided below. Do NOT invent, rename, or embellish the product.\n\nPRODUCT NAME: "+title+"\nPRODUCT DETAILS: "+desc+"\nGOAL: "+goal+". OCCASION: "+occ+
-        "\n\nPLATFORM RULES: "+RULES[pid]+
-        "\n\nRespond with ONLY a JSON object, no markdown, no preamble: "+
-        (isPinterest ? pinterestJson : standardJson)
-      );
-    }catch(e){ pack[pid]={error:e.message}; }
+    const rules = state.plats.map(p=>RULES[p]).join('\n\n');
+    const sys = BRAND + '\nYou write the final copy. Follow the approved strategy exactly. Respond ONLY with valid JSON, no preamble, no markdown fences.';
+    const schema = state.plats.map(p=>{
+      if(p==='instagram') return '"instagram": {"caption":"", "hashtags":["#..."], "altText":"", "onScreenText":""}';
+      if(p==='tiktok') return '"tiktok": {"caption":"", "hashtags":[], "onScreenText":"", "spokenKeywords":["",""], "altText":""}';
+      if(p==='facebook') return '"facebook": {"caption":"", "hashtags":[], "altText":"", "formatNote":"", "firstComment":"link line for the first comment"}';
+      if(p==='youtube') return '"youtube": {"title":"", "caption":"", "hashtags":[], "altText":""}';
+      return '"pinterest": {"pins":[{"title":"","description":"","altText":""},{"title":"","description":"","altText":""},{"title":"","description":"","altText":""}], "hashtags":[]}';
+    }).join(',\n');
+    const videoPlats = state.plats.filter(p=>['tiktok','instagram','youtube','facebook'].includes(p));
+    const wantCarousel = state.plats.includes('instagram')||state.plats.includes('facebook');
+    const carouselSchema = wantCarousel ? ',\n"carousel": {"concept":"", "saveReason":"", "slides":[{"n":1,"overlay":"max 8 words","support":"","photo":"what to shoot"}]}' : '';
+    const scriptSchema = videoPlats.length ? ',\n"videoScript": {"duration":"e.g. 20 seconds", "format":"the format being filmed", "lines":[{"time":"0-2s","say":"exact words","shot":"what is on camera","keyword":true}]}' : '';
+    const user = `APPROVED STRATEGY:\n${JSON.stringify(s)}\n\nPRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\n\nPLATFORM RULES, FOLLOW EXACTLY INCLUDING HASHTAG COUNTS:\n${rules}${videoPlats.length? '\n\n'+SCRIPT_RULE : ''}${wantCarousel? '\n\n'+CAROUSEL_RULE : ''}\n\nRespond with ONLY this JSON:\n{\n${schema}${scriptSchema}${carouselSchema}\n}`;
+    let pack = deepSanitise(await callClaude(sys, user, 4000));
+    pack = enforceRules(pack);
+    state.pack = pack;
+    saveHistory(prod, s, pack);
     renderPack();
+  }catch(e){ showError(e.message); btn.disabled=false; btn.textContent='Write the pack'; }
+}
+
+/* Self-check: enforce hard caps client-side so output can never break the rules */
+function enforceRules(pack){
+  for(const p of Object.keys(pack)){
+    const c=CAPS[p]; if(!c) continue;
+    let tags = (pack[p].hashtags||[]).map(t=>t.startsWith('#')?t:'#'+t.replace(/\s+/g,''));
+    if(p==='youtube' && !tags.some(t=>t.toLowerCase()==='#shorts')) tags.unshift('#Shorts');
+    if(tags.length>c.max) tags=tags.slice(0,c.max);
+    pack[p].hashtags=tags;
+    if(pack[p].altText && pack[p].altText.length>125) pack[p].altText=pack[p].altText.slice(0,122).replace(/\s\S*$/,'')+'.';
+    if(pack[p].pins) pack[p].pins.forEach(pin=>{ if(pin.altText&&pin.altText.length>125) pin.altText=pin.altText.slice(0,122).replace(/\s\S*$/,'')+'.'; });
   }
-
-  // Generate infographics — one per style×size combination
-  if(selectedStyles.length>0){
-    pack.infographics=[];
-    for(const styleId of selectedStyles){
-      for(const sizeId of selectedSizes){
-        const st=INFOG_STYLES.find(s=>s.id===styleId);
-        const sz=SIZES.find(s=>s.id===sizeId);
-        btn.textContent="Writing "+st.name+" · "+sz.label+"…";
-        try{
-          const r=await callClaude(
-            BRAND+"\n\nSTRICT RULES — all must be followed:\n1. Use ONLY the product name and details provided. Do NOT invent or rename the product.\n2. NEVER hardcode any colours. ALL colours must be derived from the uploaded product reference image.\n3. Envelope must be plain white, natural kraft, or completely omitted. NEVER coloured.\n4. Background must always be bright, clean and light. Never dark, never moody.\n5. Props must match the specific occasion of this product.\n\nPRODUCT NAME: "+title+"\nPRODUCT DETAILS: "+desc+"\nOCCASION: "+occ+
-            "\n\nWrite an AI image generation prompt"+(st.customRules?" for a clear, informative product infographic":" for a human, editorial, emotionally-driven social media image. Not a commercial poster")+". The person will upload their actual product photo alongside this prompt in ChatGPT so all colours are pulled from the real product automatically. Adapt this base layout to the product and occasion. Write the ACTUAL WORDS appearing in the image"+(st.customRules?" (steps, labels, feature names — short and real, matching this specific product).":" (max 3 short lines). Every word must earn its place.")+"  \n\nBASE TEMPLATE: "+
-            st.base.replace("{SIZE}", sz.px+" ("+sz.id+" ratio)")+
-            (st.customRules ? PRODUCT_INFOG_RULES : INFOG_RULES)+
-            '\n\nRespond with ONLY a JSON object, no markdown: {"prompt":"the complete final AI image generation prompt — end with: Upload your product reference image alongside this prompt so colours match your actual design.","overlay":"the exact hero headline or key text used in the image, max 8 words"}'
-          );
-          pack.infographics.push({...r, styleId, styleName:st.name, sizeId, sizeLabel:sz.label, sizePx:sz.px});
-        }catch(e){
-          pack.infographics.push({error:e.message, styleId, styleName:st.name, sizeId, sizeLabel:sz.label});
-        }
-        renderPack();
-      }
-    }
-  }
-
-  busy=false; btn.disabled=false; btn.textContent="Generate content pack";
-  saveHistory();
-  renderPublishBuffer();
+  return pack;
+}
+function qualityChecks(p, d){
+  const checks=[];
+  const all = JSON.stringify(d);
+  checks.push({ok: !/[\u2014\u2013]/.test(all), t:'No em dashes'});
+  const c=CAPS[p], n=(d.hashtags||[]).length;
+  checks.push({ok: n>=Math.min(c.min,n===0?0:c.min)&&n<=c.max&&n>=c.min, t:'Hashtags: '+n+' (cap '+c.min+' to '+c.max+')'});
+  if(p==='youtube') checks.push({ok:(d.hashtags||[]).some(t=>t.toLowerCase()==='#shorts'), t:'#Shorts included'});
+  const alts = d.pins? d.pins.map(x=>x.altText): [d.altText];
+  checks.push({ok: alts.every(a=>a&&a.length<=125), t:'Alt text under 125 chars'});
+  return checks;
 }
 
-// ============ RENDER ============
-function esc(s){ const d=document.createElement("div"); d.textContent=s||""; return d.innerHTML; }
-function showError(m){
-  const e=document.getElementById("errorBox");
-  e.style.display=m?"block":"none"; e.textContent=m;
-}
-function copyText(btn,text){
-  navigator.clipboard.writeText(text).then(()=>{
-    const old=btn.textContent; btn.textContent="Copied ✓"; btn.classList.add("ok");
-    setTimeout(()=>{btn.textContent=old;btn.classList.remove("ok");},1800);
-  });
-}
+/* ==================== RENDER PACK ==================== */
 function renderPack(){
-  const r=document.getElementById("results"); r.innerHTML="";
-  if(!pack) return;
-  PLATFORMS.filter(p=>pack[p.id]).forEach(p=>{
-    const d=pack[p.id];
-    const card=document.createElement("div"); card.className="platcard";
-    if(d.error){
-      card.innerHTML='<div class="plathead"><div class="t">'+p.emoji+' '+p.name+'</div></div><div style="color:#8A3D49;font-size:13px">Couldn\'t generate: '+esc(d.error)+'</div>';
-    } else if(p.id==="pinterest" && d.pins){
-      // Pinterest: 3 separate pin cards
-      let html='<div class="plathead"><div class="t">'+p.emoji+' Pinterest · 3 Pin Variations</div></div>';
-      html+=(d.postingNotes?'<div class="note" style="margin-bottom:10px">📋 '+esc(d.postingNotes)+'</div>':'');
-      d.pins.forEach((pin,i)=>{
-        html+=
-          '<div style="background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px">'+
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
-          '<div style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:13px;color:var(--ink)">Pin '+(i+1)+'</div>'+
-          '<button class="btn2" style="font-size:11px;padding:6px 12px" onclick="copyText(this,\''+pin.title.replace(/'/g,"\\'")+' '+pin.description.replace(/'/g,"\\'")+'\')">Copy title + desc</button>'+
-          '</div>'+
-          '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:3px">Title <span style="color:var(--inksoft);font-weight:400;text-transform:none">('+pin.title.length+'/100 chars)</span></div>'+
-          '<div class="captionbox" style="margin-bottom:8px;font-size:13px">'+esc(pin.title)+'</div>'+
-          '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:3px">Description <span style="color:var(--inksoft);font-weight:400;text-transform:none">('+pin.description.length+'/500 chars)</span></div>'+
-          '<div class="captionbox" style="margin-bottom:8px;font-size:13px">'+esc(pin.description)+'</div>'+
-          (pin.altText?
-            '<div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--sage);margin-bottom:3px">Alt text <span style="color:var(--inksoft);font-weight:400;text-transform:none">('+pin.altText.length+'/500 chars)</span></div>'+
-            '<div style="display:flex;gap:8px;align-items:flex-start">'+
-            '<div class="captionbox" style="flex:1;font-size:12px;color:var(--inksoft)">'+esc(pin.altText)+'</div>'+
-            '<button class="btn2" style="font-size:11px;padding:6px 12px;flex-shrink:0;background:var(--sage)" onclick="copyText(this,\''+pin.altText.replace(/'/g,"\\'")+'\')">Copy alt</button>'+
-            '</div>' : '')+
-          '</div>';
-      });
-      card.innerHTML=html;
-    } else {
-      let tags="";
-      (d.hashtags||[]).forEach(h=>{
-        const c=TAGC[h.type]||TAGC.niche;
-        tags+='<span class="tag" style="background:'+c[0]+';color:'+c[1]+'">'+esc(h.tag)+'</span>';
-      });
-      card.innerHTML =
-        '<div class="plathead"><div class="t">'+p.emoji+' '+p.name+'</div><button class="btn2">Copy caption</button></div>'+
-        '<div class="captionbox">'+esc(d.caption)+'</div>'+
-        (tags?'<div class="tags">'+tags+'</div>':'')+
-        (d.onScreenText?'<div class="box gold"><b>On-screen text (first 2 sec):</b> '+esc(d.onScreenText)+'</div>':'')+
-        (d.spokenKeywords?'<div class="box sage"><b>Say out loud:</b> '+esc(d.spokenKeywords.join(" · "))+'</div>':'')+
-        (d.videoHook?'<div class="note">🎬 <b>First 3 seconds:</b> '+esc(d.videoHook)+'</div>':'')+
-        (d.altText?
-          '<div style="display:flex;align-items:flex-start;gap:8px;margin-top:8px">'+
-          '<div class="note" style="flex:1">🖼 <b>Alt text:</b> '+esc(d.altText)+'</div>'+
-          '<button class="btn2" style="font-size:11px;padding:6px 12px;flex-shrink:0;background:var(--sage)" onclick="copyText(this,\''+((d.altText||'').replace(/'/g,"\\'")+'\')">Copy alt</button>'+
-          '</div>') : '')+
-        (d.postingNotes?'<div class="note">📋 '+esc(d.postingNotes)+'</div>':'');
-      card.querySelector(".btn2").onclick=function(){copyText(this,d.caption);};
-    }
-    r.appendChild(card);
-  });
-  if(pack.infographics && pack.infographics.length>0){
-    pack.infographics.forEach((d,i)=>{
-      const card=document.createElement("div"); card.className="platcard gold";
-      if(d.error){
-        card.innerHTML='<div class="plathead"><div class="t">🖼 '+esc(d.styleName)+' · '+esc(d.sizeLabel)+'</div></div><div style="color:#8A3D49;font-size:13px">Couldn\'t generate: '+esc(d.error)+'</div>';
-      }else{
-        card.innerHTML=
-          '<div class="plathead"><div class="t">🖼 '+esc(d.styleName)+'</div>'+
-          '<span style="font-size:11px;color:var(--inksoft);background:var(--cream);border:1px solid var(--line);padding:3px 8px;border-radius:8px">'+esc(d.sizeLabel)+' · '+esc(d.sizePx)+'</span>'+
-          '<button class="btn2">Copy prompt</button></div>'+
-          (d.overlay?'<div class="overlay">"'+esc(d.overlay)+'"</div>':'')+
-          '<div class="captionbox">'+esc(d.prompt)+'</div>'+
-          '<div class="note">📋 Upload your product photo alongside this prompt so colours come from the real product.</div>';
-        card.querySelector(".btn2").onclick=function(){copyText(this,d.prompt);};
-      }
-      r.appendChild(card);
-    });
+  const pk=state.pack; if(!pk) return;
+  let html='';
+  if(pk.videoScript && pk.videoScript.lines){
+    const vs=pk.videoScript;
+    const rows = vs.lines.map(l=>
+      '<div style="display:flex;gap:10px;margin-top:9px;align-items:flex-start">'+
+      '<span class="tag" style="flex-shrink:0;min-width:52px;text-align:center">'+esc(l.time)+'</span>'+
+      '<div style="min-width:0"><div style="font-size:.95rem;line-height:1.6">'+(l.keyword?'<b>':'')+esc(l.say)+(l.keyword?'</b> <span class="tag pk" style="font-size:.62rem">keyword</span>':'')+'</div>'+
+      (l.shot?'<div class="hint" style="margin-top:1px">Shot: '+esc(l.shot)+'</div>':'')+'</div></div>').join('');
+    const full = vs.lines.map(l=>l.time+': '+l.say).join('\n');
+    html += '<div class="card thinkcard"><h2>\uD83C\uDFAC What to say on camera</h2>'+
+      '<div class="hint">'+esc(vs.duration||'')+(vs.format?' \u00b7 '+esc(vs.format):'')+' \u00b7 Bold lines carry your search keywords, say them clearly.</div>'+
+      rows+'<button class="copybtn" onclick="copyText('+JSON.stringify(full)+', this)">Copy full script</button></div>';
   }
+  if(pk.carousel && pk.carousel.slides){
+    const c=pk.carousel;
+    const slides=c.slides.map(s=>
+      '<div style="border:1px solid var(--gold-pale);border-radius:12px;padding:11px;margin-top:9px;background:var(--cream)">'+
+      '<span class="tag" style="margin-bottom:5px;display:inline-block">Slide '+esc(s.n)+(s.n==1?' \u00b7 hook':(s.n==c.slides.length?' \u00b7 CTA':''))+'</span>'+
+      '<div class="serif" style="font-size:1.05rem;line-height:1.4">'+esc(s.overlay)+'</div>'+
+      (s.support?'<div style="font-size:.85rem;margin-top:3px">'+esc(s.support)+'</div>':'')+
+      '<div class="hint" style="margin-top:5px">Shoot: '+esc(s.photo)+'</div></div>').join('');
+    const full=c.slides.map(s=>'Slide '+s.n+': '+s.overlay+(s.support?'\n'+s.support:'')+'\nPhoto: '+s.photo).join('\n\n');
+    html += '<div class="card"><span class="plat-head" style="background:var(--gold)">Carousel \u00b7 '+c.slides.length+' slides</span>'+
+      '<div style="font-size:.9rem;margin-bottom:2px"><b>Concept:</b> '+esc(c.concept)+'</div>'+
+      '<div class="hint">Why it gets saved: '+esc(c.saveReason||'')+'</div>'+slides+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="copybtn" onclick="copyText('+JSON.stringify(full)+', this)">Copy all slides</button>'+
+      '<button class="copybtn" onclick="regenCarousel(this)">Different carousel idea</button></div></div>';
+  }
+  for(const pid of state.plats){
+    const d=pk[pid]; if(!d) continue;
+    const pl=PLATFORMS.find(x=>x.id===pid);
+    const checks = qualityChecks(pid,d).map(c=>'<div class="checkline"><span class="dot '+(c.ok?'ok':'bad')+'"></span>'+esc(c.t)+'</div>').join('');
+    let body='';
+    if(pid==='pinterest'){
+      body = (d.pins||[]).map((pin,i)=>`
+        <div class="subhead">Pin ${i+1} title</div><div class="out">${esc(pin.title)}</div>
+        <button class="copybtn" onclick="copyText(${JSON.stringify(pin.title)}, this)">Copy title</button>
+        <div class="subhead">Pin ${i+1} description</div><div class="out">${esc(pin.description)}</div>
+        <button class="copybtn" onclick="copyText(${JSON.stringify(pin.description)}, this)">Copy description</button>
+        <div class="subhead">Pin ${i+1} alt text</div><div class="out">${esc(pin.altText)}</div>`).join('') +
+        `<div class="hint" style="margin-top:8px">Image: 1000 x 1500 portrait. Saves are the top signal.</div>`;
+    } else {
+      if(d.title) body += `<div class="subhead">Title</div><div class="out">${esc(d.title)}</div><button class="copybtn" onclick="copyText(${JSON.stringify(d.title)}, this)">Copy title</button>`;
+      body += `<div class="subhead">Caption</div><div class="out">${esc(d.caption)}</div><button class="copybtn" onclick="copyText(${JSON.stringify(d.caption+'\n\n'+(d.hashtags||[]).join(' '))}, this)">Copy caption + tags</button>`;
+      if(d.onScreenText) body += `<div class="subhead">On-screen text, first 2 seconds</div><div class="out">${esc(d.onScreenText)}</div>`;
+      if(d.spokenKeywords) body += `<div class="subhead">Say these out loud early</div><div class="out">${esc((d.spokenKeywords||[]).join(' \u00b7 '))}</div>`;
+      if(d.formatNote) body += `<div class="subhead">Format for this slot</div><div class="out">${esc(d.formatNote)}</div>`;
+      if(d.firstComment) body += `<div class="subhead">First comment (link goes here, not the post)</div><div class="out">${esc(d.firstComment)}</div><button class="copybtn" onclick="copyText(${JSON.stringify(d.firstComment)}, this)">Copy comment</button>`;
+      if(d.altText) body += `<div class="subhead">Alt text</div><div class="out">${esc(d.altText)}</div>`;
+    }
+    const tags=(d.hashtags||[]).map((t,i)=>'<span class="tag '+(i%2?'pk':'')+'">'+esc(t)+'</span>').join('');
+    html += `<div class="card"><span class="plat-head ${pl.cls}">${pl.name}</span>${body}
+      <div class="tagrow">${tags}</div>
+      ${tags?'<button class="copybtn" onclick="copyText('+JSON.stringify((d.hashtags||[]).join(' '))+', this)">Copy hashtags</button>':''}
+      <div style="margin-top:10px">${checks}</div></div>`;
+  }
+  $('packBox').innerHTML = html;
+  $('packBox').scrollIntoView({behavior:'smooth'});
 }
 
-// ============ PUBLISH TO MAKE ============
-
-// ============ HISTORY ============
-function saveHistory(){
+/* ==================== CAROUSEL REGEN ==================== */
+async function regenCarousel(btn){
+  btn.textContent='Thinking...';
   try{
-    const h=JSON.parse(localStorage.getItem("pce_hist")||"[]");
-    h.unshift({meta:packMeta,pack:pack});
-    localStorage.setItem("pce_hist",JSON.stringify(h.slice(0,8)));
-    renderHistory();
-  }catch(e){}
+    const prod=currentProduct();
+    const prev = state.pack.carousel ? 'Do NOT repeat this previous concept: '+state.pack.carousel.concept : '';
+    const sys = BRAND+'\n'+CAROUSEL_RULE+'\nRespond ONLY with valid JSON, no preamble, no markdown fences.';
+    const user = `PRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\nSTRATEGY: ${JSON.stringify(state.strategy)}\n${prev}\nGive one fresh carousel with a clearly different angle. Respond with ONLY this JSON:\n{"concept":"", "saveReason":"", "slides":[{"n":1,"overlay":"","support":"","photo":""}]}`;
+    state.pack.carousel = deepSanitise(await callClaude(sys, user, 1500));
+    if(state.hist[0]) {state.hist[0].pack=state.pack; localStorage.setItem('pcb_hist', JSON.stringify(state.hist));}
+    renderPack();
+  }catch(e){ toast(e.message); btn.textContent='Different carousel idea'; }
+}
+
+/* ==================== HISTORY ==================== */
+function saveHistory(prod, strategy, pack){
+  state.hist.unshift({date:new Date().toISOString().slice(0,10), product:prod.title, occ:briefOccasion(), plats:[...state.plats], strategy, pack});
+  state.hist = state.hist.slice(0,10);
+  localStorage.setItem('pcb_hist', JSON.stringify(state.hist));
+  renderHistory();
 }
 function renderHistory(){
-  let h=[]; try{h=JSON.parse(localStorage.getItem("pce_hist")||"[]");}catch(e){}
-  const card=document.getElementById("histCard"), list=document.getElementById("histList");
-  if(!h.length){card.style.display="none";return;}
-  card.style.display="block"; list.innerHTML="";
-  h.forEach(item=>{
-    const b=document.createElement("button");
-    b.textContent=item.meta.title.slice(0,32)+(item.meta.occ&&item.meta.occ!=="general gifting"?" · "+item.meta.occ:"");
-    b.onclick=()=>{
-      pack=item.pack; packMeta=item.meta;
-      selectProduct({title:item.meta.title, desc:item.meta.desc||"", image:null, price:""});
-      document.getElementById("occasion").value=item.meta.occ==="general gifting"?"":item.meta.occ;
-      selectedStyles=[]; selectedSizes=["4:5"]; previewStyle=null;
-      renderChips(); renderPack(); renderPublish();
-      window.scrollTo({top:0,behavior:"smooth"});
-    };
-    list.appendChild(b);
-  });
+  if(!state.hist.length){$('histCard').style.display='none';return}
+  $('histCard').style.display='block';
+  $('histList').innerHTML = state.hist.map((h,i)=>'<button onclick="loadHist('+i+')">'+esc(h.product.slice(0,28))+(h.occ?' \u00b7 '+esc(h.occ):'')+' \u00b7 '+h.date+'</button>').join('');
+}
+function loadHist(i){
+  const h=state.hist[i];
+  state.strategy=h.strategy; state.pack=h.pack; state.plats=h.plats;
+  renderBrief(); renderStrategy(); renderPack(); toast('Loaded: '+h.product.slice(0,30));
 }
 
-// ============ INIT ============
-loadSettings(); renderChips(); renderHistory(); loadAllProducts();
-if(!localStorage.getItem("pce_key")) document.getElementById("settings").setAttribute("open","");
+/* ==================== PLANNER ==================== */
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+function renderCal(){
+  $('dayTabs').innerHTML = DAYS.map(d=>'<button class="chip '+(state.day===d?'on':'')+'" onclick="state.day=\''+d+'\';renderCal()">'+d.slice(0,3)+'</button>').join('');
+  $('calDayLabel').textContent = state.day;
+  $('calPlatform').innerHTML = PLATFORMS.map(p=>'<button class="chip '+((state.calPlat||'Instagram')===p.name?'on':'')+'" onclick="state.calPlat=\''+p.name+'\';renderCal()">'+p.name+'</button>').join('');
+  let html='';
+  for(const d of DAYS){
+    const items=(state.cal[d]||[]);
+    if(!items.length && d!==state.day) continue;
+    html += '<div class="calslot"><b class="serif">'+d+'</b>'+
+      (items.length? items.map((it,i)=>'<div class="calitem"><b>'+esc(it.p)+':</b> '+esc(it.t)+'<button class="del" onclick="delCal(\''+d+'\','+i+')">\u00d7</button></div>').join('') : '<div class="hint">Nothing planned yet.</div>')+'</div>';
+  }
+  const fb=Object.values(state.cal).flat().filter(x=>x.p==='Facebook');
+  if(fb.length) html += '<div class="hint" style="margin-top:8px">Facebook this week: '+fb.length+' posts. Mix check: one photo, one photo or carousel, one Reel.</div>';
+  $('calList').innerHTML=html;
+}
+function addCal(){
+  const t=$('calText').value.trim(); if(!t){toast('Type the post idea first');return}
+  state.cal[state.day]=state.cal[state.day]||[];
+  state.cal[state.day].push({p:state.calPlat||'Instagram',t});
+  localStorage.setItem('pcb_cal',JSON.stringify(state.cal));
+  $('calText').value=''; renderCal();
+}
+function delCal(d,i){state.cal[d].splice(i,1);localStorage.setItem('pcb_cal',JSON.stringify(state.cal));renderCal()}
+function exportCal(){
+  const blob=new Blob([JSON.stringify({cal:state.cal,hist:state.hist},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='printarelle-plan.json';a.click();
+}
+function importCal(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);state.cal=d.cal||d;if(d.hist)state.hist=d.hist;
+    localStorage.setItem('pcb_cal',JSON.stringify(state.cal));localStorage.setItem('pcb_hist',JSON.stringify(state.hist));
+    renderCal();renderHistory();toast('Plan imported')}catch(e){toast('Could not read that file')}};
+  r.readAsText(f);
+}
+
+/* ==================== HOOK BANK ==================== */
+const HOOKS=[
+ {t:"POV: you found the surprise reveal that beats an envelope",g:"Scratch ticket",s:"POV"},
+ {t:"Watch them scratch this and find out they're going to be a grandparent",g:"Scratch ticket",s:"Emotional"},
+ {t:"This is how you announce a wedding in 2026",g:"Scratch ticket",s:"Bold claim"},
+ {t:"The gift that makes them cry before they even open it",g:"Foil card",s:"Emotional"},
+ {t:"Stop buying boring cards. Watch this.",g:"Foil card",s:"Bold claim"},
+ {t:"Real gold foil, pressed by hand, in a studio in Mallow",g:"Foil card",s:"Process"},
+ {t:"3 seconds of pure foil satisfaction",g:"Foil card",s:"Satisfying"},
+ {t:"What do you write in a communion card? Here's your answer",g:"Foil card",s:"Search answer"},
+ {t:"The Irish language card range nobody else makes",g:"Irish card",s:"Bold claim"},
+ {t:"Go raibh maith agat, but make it gold foil",g:"Irish card",s:"Satisfying"},
+ {t:"Grá. One word, pressed in real gold",g:"Irish card",s:"Emotional"},
+ {t:"The cake topper that made the whole party stop",g:"Cake topper",s:"Emotional"},
+ {t:"Cake topper ideas for a 30th, sorted",g:"Cake topper",s:"Search answer"},
+ {t:"Yes, it's edible. Yes, it's personalised. Watch.",g:"Cake topper",s:"Bold claim"},
+ {t:"Packing your orders at 6am in Mallow, come with me",g:"Any",s:"Process"},
+ {t:"Every order gets one of these, and nobody knows",g:"Any",s:"Curiosity"},
+ {t:"I made someone cry with paper this week",g:"Any",s:"Emotional"},
+ {t:"Handmade means someone in Ireland touched every single piece",g:"Any",s:"Process"},
+ {t:"The most searched question about our invitations, answered",g:"Invitation",s:"Search answer"},
+ {t:"Which one would you pick? Left or right",g:"Any",s:"Engagement"}
+];
+function renderHookFilters(){
+  const prods=["All","Foil card","Scratch ticket","Irish card","Cake topper","Invitation","Any"];
+  const styles=["All","Emotional","Bold claim","Process","Search answer","Satisfying","POV","Curiosity","Engagement"];
+  $('hookProduct').innerHTML=prods.map(p=>'<button class="chip '+(state.hookP===p?'on':'')+'" onclick="state.hookP=\''+p+'\';renderHookFilters();renderHooks()">'+p+'</button>').join('');
+  $('hookStyle').innerHTML=styles.map(s=>'<button class="chip '+(state.hookS===s?'pinkon':'')+'" onclick="state.hookS=\''+s+'\';renderHookFilters();renderHooks()">'+s+'</button>').join('');
+}
+function renderHookProducts(){
+  const opts = ['<option value="">General, no specific product</option>']
+    .concat(state.products.map(p=>'<option value="'+esc(p.title)+'">'+esc(p.title)+'</option>'));
+  $('hookShopProd').innerHTML = opts.join('');
+}
+function hookCard(h, mine){
+  return '<div class="card"><div class="serif" style="font-size:1.02rem">'+esc(h.t)+'</div>'+
+    '<div class="tagrow"><span class="tag">'+esc(h.g)+'</span><span class="tag pk">'+esc(h.s)+'</span>'+(mine?'<span class="tag" style="background:var(--sage-pale)">AI, yours</span>':'')+'</div>'+
+    '<button class="copybtn" onclick="copyText('+JSON.stringify(h.t)+', this)">Copy hook</button>'+
+    (mine?'<button class="copybtn" onclick="delHook('+h.id+')">Remove</button>':'')+'</div>';
+}
+function renderHooks(){
+  const match = h => (state.hookP==='All'||h.g===state.hookP)&&(state.hookS==='All'||h.s===state.hookS);
+  const mine = state.myHooks.filter(match), built = HOOKS.filter(match);
+  let html = mine.map(h=>hookCard(h,true)).join('') + built.map(h=>hookCard(h,false)).join('');
+  if(!html) html = '<div class="card"><div class="hint">Nothing in the bank for that combination yet. Tap Generate 5 new hooks above and the AI will write them for exactly these filters, then they live here permanently.</div></div>';
+  $('hookResults').innerHTML = html;
+}
+function delHook(id){
+  state.myHooks = state.myHooks.filter(h=>h.id!==id);
+  localStorage.setItem('pcb_hooks', JSON.stringify(state.myHooks));
+  renderHooks();
+}
+async function genHooks(){
+  const btn=$('hookGenBtn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span>Writing hooks...';
+  try{
+    const prodTitle = $('hookShopProd').value;
+    const shopProd = state.products.find(p=>p.title===prodTitle);
+    const pFilter = state.hookP==='All' ? 'any Printarelle product' : state.hookP;
+    const sFilter = state.hookS==='All' ? 'a mix of styles' : 'the '+state.hookS+' style';
+    const styleGuide = 'Styles mean: Emotional pulls the heart, Bold claim makes a confident statement, Process shows the making, Search answer answers a real search question, Satisfying promises a satisfying visual, POV puts the viewer in the scene, Curiosity opens a loop, Engagement asks the viewer to respond.';
+    const sys = BRAND + '\nYou write scroll-stopping hooks: the first line of a caption or the on-screen text of the first video frame. Max 12 words each. Half of viewers are on mute, hooks must work silently. Lead with searchable words where natural. '+styleGuide+'\nRespond ONLY with valid JSON, no preamble, no markdown fences.';
+    const user = `Write 5 fresh hooks for ${pFilter}, in ${sFilter}.`+
+      (shopProd? `\nWrite them specifically for this Shopify product:\nPRODUCT: ${shopProd.title}\nDETAILS: ${shopProd.desc}`:'')+
+      `\nDo not repeat any of these existing hooks:\n${[...state.myHooks,...HOOKS].map(h=>h.t).join('\n')}\nRespond with ONLY this JSON:\n{"hooks":[{"t":"the hook","s":"one of: Emotional, Bold claim, Process, Search answer, Satisfying, POV, Curiosity, Engagement"}]}`;
+    const out = deepSanitise(await callClaude(sys, user, 900));
+    const g = state.hookP==='All' ? (shopProd? shopProd.title.slice(0,24) : 'Any') : state.hookP;
+    (out.hooks||[]).slice(0,5).forEach(h=>state.myHooks.unshift({id:Date.now()+Math.random(), t:h.t, s:h.s||state.hookS, g}));
+    state.myHooks = state.myHooks.slice(0,80);
+    localStorage.setItem('pcb_hooks', JSON.stringify(state.myHooks));
+    renderHooks(); toast('5 new hooks added to your bank');
+  }catch(e){ toast(e.message); }
+  btn.disabled=false; btn.textContent='Generate 5 new hooks';
+}
+
+/* ==================== CHEAT SHEET ==================== */
+function renderCheat(){
+  $('cheatBody').innerHTML=`
+  <div class="card cheat"><h3>Hashtag caps, verified July 2026</h3><ul>
+    <li><b>Instagram:</b> 5 hard cap, caption and comments combined, extras demote the post</li>
+    <li><b>TikTok:</b> 3 to 5, spoken and on-screen keywords weigh equal or more</li>
+    <li><b>Facebook:</b> 1 to 3, reach comes from shares and comments</li>
+    <li><b>YouTube Shorts:</b> 3 to 5 in the description plus #Shorts, never in the title, over 15 total and all are ignored</li>
+    <li><b>Pinterest:</b> 10 to 15, corrected up from 3 to 8, Pinterest works like a search engine</li>
+  </ul></div>
+  <div class="card cheat"><h3>Platform signals, skill v3.0.0</h3><ul>
+    <li><b>Instagram:</b> shares and DM sends outrank likes, watch completion is the primary Reel metric, first 2 to 3 seconds decide it, carousels top static format</li>
+    <li><b>TikTok:</b> completion bar now about 70%, new videos test with 200 to 500 viewers, signal order: completion, loop rate, shares (3x likes), saves, comments. Keyword in audio, on-screen text, and caption. 15 to 30 seconds is the safe default</li>
+    <li><b>Facebook:</b> Reels reach 5 to 10x photo posts, True Interest Survey punishes clickbait, reply within the first hour, weekly mix: one photo, one photo or carousel, one Reel</li>
+    <li><b>Shorts:</b> rank on replay, click-through, like-to-view, share rate. 48 hour freshness boost on publish</li>
+    <li><b>Pinterest:</b> saves top signal, first 50 to 60 chars of the description carry the most weight, image AI reads colours and materials, seasonal pins 6 to 8 weeks ahead, 1000 x 1500 portrait</li>
+  </ul></div>
+  <div class="card cheat"><h3>Hard brand rules</h3><ul>
+    <li>Never an em dash, anywhere, ever</li>
+    <li>Irish spelling always: personalised, colour, mam</li>
+    <li>Handmade in Ireland in the copy, Cork is provenance only</li>
+    <li>Keyword-first captions: first line in the words a customer would search</li>
+    <li>No watermarked cross-posts, native export per platform</li>
+    <li>Facebook links in the first comment, never the post body</li>
+  </ul></div>
+  <div class="card cheat"><h3>What wins in the handmade niche</h3><ul>
+    <li>Pack an order and ASMR packing: the single strongest verified format</li>
+    <li>Scratch and foil reveal at second 2, looped ending</li>
+    <li>Founder-led beats polished, recurring series train return viewers</li>
+    <li>Irish language cards and scratch tickets: under-served on TikTok and Pinterest, lean in</li>
+  </ul></div>
+  <div class="card cheat"><h3>Refresh cadence</h3><ul>
+    <li>Re-research every 2 to 3 months, hashtag caps and platform signals move fastest</li>
+  </ul></div>`;
+}
+
+/* ==================== NAV & INIT ==================== */
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('main section').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.tab).classList.add('active');
+  window.scrollTo({top:0});
+}));
+(function init(){
+  $('apiKey').value = localStorage.getItem('pcb_key')||'';
+  $('shopDomain').value = localStorage.getItem('pcb_shop')||'';
+  updateSetStatus(); renderModelChips(); renderBrief(); renderCal();
+  renderHookFilters(); renderHookProducts(); renderHooks(); renderCheat(); renderHistory();
+  if(state.products.length){renderProducts(state.products.slice(0,6));$('prodHint').textContent=state.products.length+' products cached. Tap refresh to update from Shopify.'}
+  else if(localStorage.getItem('pcb_shop')) loadProducts(false);
+})();
 </script>
 </body>
 </html>
