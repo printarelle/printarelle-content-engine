@@ -138,11 +138,11 @@ details.settings{margin-bottom:14px}
   <label>Platforms</label><div class="chiprow" id="platChips"></div>
   <label>Anything else the brain should know? (optional)</label>
   <textarea id="briefExtra" placeholder="e.g. launching Friday, I have a scratch reveal video already filmed"></textarea>
-  <button class="btn wide" id="thinkBtn" onclick="runStrategy()">Think first</button>
+  <button class="btn wide" id="thinkBtn" onclick="runDirect()">Generate content pack</button>
 </div>
 
 <div id="errorBox"></div>
-<div id="strategyBox"></div>
+<div id="strategyBox" style="display:none"></div>
 <div id="packBox"></div>
 
 <div class="card" id="histCard" style="display:none">
@@ -273,10 +273,21 @@ function deepSanitise(o){
   return o;
 }
 function copyText(txt, btn){
-  navigator.clipboard.writeText(txt).then(()=>{
-    const old=btn.textContent; btn.textContent='Copied \u2713'; btn.classList.add('done');
-    setTimeout(()=>{btn.textContent=old;btn.classList.remove('done')},1600);
-  }).catch(()=>toast('Copy failed, long-press the text instead'));
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>_copyDone(btn)).catch(()=>_copyFallback(txt,btn));
+  } else { _copyFallback(txt,btn); }
+}
+function _copyDone(btn){
+  const old=btn.textContent; btn.textContent='Copied ✓'; btn.classList.add('done');
+  setTimeout(()=>{btn.textContent=old;btn.classList.remove('done')},1600);
+}
+function _copyFallback(txt,btn){
+  const ta=document.createElement('textarea');
+  ta.value=txt; ta.style.cssText='position:fixed;opacity:0;top:0;left:0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); _copyDone(btn); }
+  catch(e){ toast('Select the text above and press Ctrl+C'); }
+  document.body.removeChild(ta);
 }
 function showError(msg){$('errorBox').innerHTML='<div class="error">'+esc(msg)+'</div>'}
 function clearError(){$('errorBox').innerHTML=''}
@@ -387,6 +398,55 @@ async function callClaude(system, user, maxTokens){
 }
 
 /* ==================== STAGE 1: THE STRATEGY BRAIN ==================== */
+async function runDirect(){
+  clearError();
+  const prod=currentProduct();
+  if(!prod){showError('Pick a product from Shopify or type one manually first.');return}
+  if(!state.plats.length){showError('Pick at least one platform.');return}
+  const btn=$('thinkBtn'); btn.disabled=true; btn.innerHTML='<span class="spin"></span>Writing your pack...';
+  $('strategyBox').innerHTML=''; $('packBox').innerHTML='';
+  try{
+    const fmts=FORMATS.filter(f=>f.p.some(p=>state.plats.includes(p))).map(f=>f.n+': '+f.d).join('; ');
+    const rules=state.plats.map(p=>RULES[p]).join('\n\n');
+    const wantCarousel=state.plats.includes('instagram')||state.plats.includes('facebook');
+    const videoPlats=state.plats.filter(p=>['tiktok','instagram','youtube','facebook'].includes(p));
+    const platformSchema=state.plats.map(p=>{
+      if(p==='instagram') return '"instagram": {"caption":"", "hashtags":[], "altText":"", "onScreenText":""}';
+      if(p==='tiktok') return '"tiktok": {"caption":"", "hashtags":[], "onScreenText":"", "spokenKeywords":[], "altText":""}';
+      if(p==='facebook') return '"facebook": {"caption":"", "hashtags":[], "altText":"", "formatNote":"", "firstComment":""}';
+      if(p==='youtube') return '"youtube": {"title":"", "caption":"", "hashtags":[], "altText":""}';
+      return '"pinterest": {"pins":[{"title":"","description":"","altText":""},{"title":"","description":"","altText":""},{"title":"","description":"","altText":""}], "hashtags":[]}';
+    }).join(',\n');
+    const scriptSchema=videoPlats.length?',\n"videoScript": {"duration":"", "format":"", "lines":[{"time":"","say":"","shot":"","keyword":true}]}':'';
+    const carouselSchema=wantCarousel?',\n"carousel": {"concept":"", "saveReason":"", "claudeDesignPrompt":"", "slides":[{"n":1,"overlay":"","support":"","photo":""}]}':'';
+    const sys=BRAND+'\n'+rules+'\n'+(videoPlats.length?SCRIPT_RULE:'')+'\n'+(wantCarousel?CAROUSEL_RULE:'')+'\nRespond ONLY with valid JSON, no preamble, no markdown fences.';
+    const user=`Write a complete social content pack for this product.
+
+PRODUCT: ${prod.title}
+DETAILS: ${prod.desc||'none'}
+GOAL: ${state.goal}
+OCCASION: ${briefOccasion()||'evergreen'}
+PLATFORMS: ${state.plats.join(', ')}
+EXTRA: ${$('briefExtra').value.trim()||'none'}
+PROVEN FORMATS FOR INSPIRATION (choose best fit per platform): ${fmts}
+
+FOLLOW ALL PLATFORM RULES INCLUDING HASHTAG CAPS.
+${wantCarousel?'For claudeDesignPrompt in the carousel: write a detailed prompt for Claude Design (claude.ai/design) to create these exact carousel slides as a polished visual. Include: the product name and occasion, the slide count, each slide overlay text, the cream and warm gold colour palette, Playfair Display headings, warm feminine style, Printarelle branding in the last slide. Make it ready to paste directly into claude.ai/design with no editing needed.':''}
+
+Respond with ONLY this JSON:
+{
+${platformSchema}${scriptSchema}${carouselSchema}
+}`;
+    let pack=deepSanitise(await callClaude(sys,user,5000));
+    pack=enforceRules(pack);
+    state.strategy={angle:'',emotionalCore:'',searchPhrase:'',whyThisWins:'',platforms:{}};
+    state.pack=pack;
+    saveHistory(prod,state.strategy,pack);
+    renderPack();
+  }catch(e){ showError(e.message); }
+  btn.disabled=false; btn.textContent='Generate content pack';
+}
+
 async function runStrategy(steer){
   clearError();
   const prod = currentProduct();
@@ -468,7 +528,7 @@ async function writePack(){
     }).join(',\n');
     const videoPlats = state.plats.filter(p=>['tiktok','instagram','youtube','facebook'].includes(p));
     const wantCarousel = state.plats.includes('instagram')||state.plats.includes('facebook');
-    const carouselSchema = wantCarousel ? ',\n"carousel": {"concept":"", "saveReason":"", "slides":[{"n":1,"overlay":"max 8 words","support":"","photo":"what to shoot"}]}' : '';
+    const carouselSchema = wantCarousel ? ',\n"carousel": {"concept":"", "saveReason":"", "claudeDesignPrompt":"", "slides":[{"n":1,"overlay":"max 8 words","support":"","photo":"what to shoot"}]}' : '';
     const scriptSchema = videoPlats.length ? ',\n"videoScript": {"duration":"e.g. 20 seconds", "format":"the format being filmed", "lines":[{"time":"0-2s","say":"exact words","shot":"what is on camera","keyword":true}]}' : '';
     const user = `APPROVED STRATEGY:\n${JSON.stringify(s)}\n\nPRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\n\nPLATFORM RULES, FOLLOW EXACTLY INCLUDING HASHTAG COUNTS:\n${rules}${videoPlats.length? '\n\n'+SCRIPT_RULE : ''}${wantCarousel? '\n\n'+CAROUSEL_RULE : ''}\n\nRespond with ONLY this JSON:\n{\n${schema}${scriptSchema}${carouselSchema}\n}`;
     let pack = deepSanitise(await callClaude(sys, user, 4000));
@@ -529,10 +589,14 @@ function renderPack(){
       (s.support?'<div style="font-size:.85rem;margin-top:3px">'+esc(s.support)+'</div>':'')+
       '<div class="hint" style="margin-top:5px">Shoot: '+esc(s.photo)+'</div></div>').join('');
     const full=c.slides.map(s=>'Slide '+s.n+': '+s.overlay+(s.support?'\n'+s.support:'')+'\nPhoto: '+s.photo).join('\n\n');
+    const designBtn = c.claudeDesignPrompt?
+      '<div class="subhead" style="margin-top:12px">Claude Design prompt, paste into claude.ai/design</div>'+
+      '<div class="out" style="font-size:.82rem">'+esc(c.claudeDesignPrompt)+'</div>'+
+      '<button class="copybtn" onclick="copyText('+JSON.stringify(c.claudeDesignPrompt)+', this)">Copy Claude Design prompt</button>':'';
     html += '<div class="card"><span class="plat-head" style="background:var(--gold)">Carousel \u00b7 '+c.slides.length+' slides</span>'+
       '<div style="font-size:.9rem;margin-bottom:2px"><b>Concept:</b> '+esc(c.concept)+'</div>'+
-      '<div class="hint">Why it gets saved: '+esc(c.saveReason||'')+'</div>'+slides+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button class="copybtn" onclick="copyText('+JSON.stringify(full)+', this)">Copy all slides</button>'+
+      '<div class="hint">Why it gets saved: '+esc(c.saveReason||'')+'</div>'+slides+designBtn+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px"><button class="copybtn" onclick="copyText('+JSON.stringify(full)+', this)">Copy all slides</button>'+
       '<button class="copybtn" onclick="regenCarousel(this)">Different carousel idea</button></div></div>';
   }
   for(const pid of state.plats){
@@ -574,7 +638,7 @@ async function regenCarousel(btn){
     const prod=currentProduct();
     const prev = state.pack.carousel ? 'Do NOT repeat this previous concept: '+state.pack.carousel.concept : '';
     const sys = BRAND+'\n'+CAROUSEL_RULE+'\nRespond ONLY with valid JSON, no preamble, no markdown fences.';
-    const user = `PRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\nSTRATEGY: ${JSON.stringify(state.strategy)}\n${prev}\nGive one fresh carousel with a clearly different angle. Respond with ONLY this JSON:\n{"concept":"", "saveReason":"", "slides":[{"n":1,"overlay":"","support":"","photo":""}]}`;
+    const user = `PRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\nSTRATEGY: ${JSON.stringify(state.strategy)}\n${prev}\nGive one fresh carousel with a clearly different angle and a new claudeDesignPrompt for claude.ai/design. Respond with ONLY this JSON:\n{"concept":"", "saveReason":"", "claudeDesignPrompt":"detailed prompt for claude.ai/design", "slides":[{"n":1,"overlay":"","support":"","photo":""}]}`;
     state.pack.carousel = deepSanitise(await callClaude(sys, user, 1500));
     if(state.hist[0]) {state.hist[0].pack=state.pack; localStorage.setItem('pcb_hist', JSON.stringify(state.hist));}
     renderPack();
