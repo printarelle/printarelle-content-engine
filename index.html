@@ -244,7 +244,15 @@ pinterest:`PINTEREST (skill v3.0.0), 3 PIN VARIATIONS. Visual search and plannin
 
 const SCRIPT_RULE = `VIDEO SCRIPT. Write exactly what Natali says to camera while filming, so she never rambles and every search keyword gets spoken out loud, because TikTok and Instagram read the audio. 15-30 seconds total. Rules: the hook is spoken in the first 2 seconds and contains the main search phrase. Repeat the product name and occasion naturally at least twice across the script. Short spoken sentences, how a real person talks, warm, no marketing voice. End with the spoken CTA matching the caption CTA. For each line give: time (e.g. 0-2s), say (the exact words), shot (what is on camera), and keyword true/false marking lines that carry a search keyword.`;
 
-const CAROUSEL_RULE = `CAROUSEL. Instagram's highest-engagement static format, also fills the Facebook photo or carousel slot. Build 4-6 slides that earn the swipe and the save. Slide 1 is the hook: keyword-led, max 8 words, must work as a standalone thumbnail. Middle slides deliver real value one idea at a time: uses, ideas, what to write, the story, the process. Last slide is the CTA slide: Save this for later, or the product name with printarelle.com. For each slide give: n (number), overlay (the on-screen text, max 8 words), support (one short supporting line under it, optional, can be empty), photo (exactly what to shoot or design for that slide, cream and gold styling). Also give concept, one sentence on what the carousel is, and saveReason, why someone saves this.`;
+const CAROUSEL_RULE = `CAROUSEL. Generate 3 completely distinct carousel options, each with a radically different visual direction. Instagram's highest-engagement static format, also fills Facebook carousel slot. Each carousel is 4-6 slides that earn the swipe and the save. Slide 1 is always the hook: keyword-led, max 8 words, works as a standalone thumbnail. Middle slides deliver value one idea at a time. Last slide is always the CTA with printarelle.com.
+
+OPTION A, Product-Driven: Every design decision comes from the product itself. If the product has gold foil, the slides mirror that texture and palette. If it is a scratch card, the slide concept plays on the reveal mechanic. If it has illustrated elements, those drive the layout. The concept must feel like the product designed the slides, not a generic template applied to it.
+
+OPTION B, Printarelle Signature: Uses the Printarelle brand world: warm cream background (#FAF6EE), real gold accents (#B4863C), Playfair Display serif headings in dark ink, Lora body text, soft pink highlight (#E5AFB4), elegant and feminine, the kind of slide someone saves to a mood board. Always beautiful, never loud.
+
+OPTION C, Wildcard: Break the mould. Choose a completely unexpected visual direction that still fits the emotional core of this product and occasion. Could be bold dark moody, maximalist pattern, hand-drawn sketch feel, editorial black and white with a single gold detail, retro typographic, or anything that surprises. Must still be achievable in Canva or Claude Design without custom assets.
+
+For each option give: id (a, b, c), name (short evocative name like "Foil & Texture" or "Cream & Gold Classic" or "Editorial Dark"), concept (one sentence on the big idea), saveReason (why someone saves this), vibe (3 mood words separated by commas), slides (4-6 slides each with n, overlay max 8 words, support one short line or empty, photo what to shoot or design), and claudeDesignPrompt (a detailed ready-to-paste prompt for claude.ai/design that fully specifies the visual style of this option, the exact slide count, each overlay text, typography, palette, Printarelle branding on last slide, and the product name and occasion).`;
 
 const BRAND = `You write social content for Printarelle (printarelle.com), a handmade personalised stationery and gifts studio in Mallow, Co. Cork, Ireland. Skill v3.0.0, July 2026, governs everything you write. Products: hand-finished real gold foil greeting cards, personalised cake toppers, edible cupcake toppers, scratch-to-reveal surprise tickets, Irish language cards, stickers, wall prints, invitations. Voice: warm, personal, joyful, gift-focused, never corporate or pushy. HARD RULES, never break: 1. No em dashes or en dashes, ever, use a comma, a colon, or a full stop. 2. Irish/UK spelling throughout, personalised never personalized. 3. Handmade in Ireland positioning; Cork is provenance only, never the primary keyword. 4. Keyword-first captions, the first line states the topic in words a customer would search, before story or flourish. 5. Native content per platform, never reference watermarks or cross-posting. Universal 2026 principles: search-first everywhere, saves and shares outrank likes everywhere, founder-led behind-the-scenes content is structurally rewarded everywhere, recurring series train return viewers, reply fast everywhere. Pack-an-order and ASMR packing is the single strongest verified format in the handmade niche; scratch reveal moments match the tickets directly; Irish language cards and scratch tickets are genuinely under-served niches on TikTok and Pinterest, lean in when relevant.`;
 
@@ -418,7 +426,7 @@ async function runDirect(){
       return '"pinterest": {"pins":[{"title":"","description":"","altText":""},{"title":"","description":"","altText":""},{"title":"","description":"","altText":""}], "hashtags":[]}';
     }).join(',\n');
     const scriptSchema=videoPlats.length?',\n"videoScript": {"duration":"", "format":"", "lines":[{"time":"","say":"","shot":"","keyword":true}]}':'';
-    const carouselSchema=wantCarousel?',\n"carousel": {"concept":"", "saveReason":"", "claudeDesignPrompt":"", "slides":[{"n":1,"overlay":"","support":"","photo":""}]}':'';
+    const carouselSchema=wantCarousel?',\n"carousel": {"options":[{"id":"a","name":"","concept":"","saveReason":"","vibe":"","slides":[{"n":1,"overlay":"","support":"","photo":""}],"claudeDesignPrompt":""},{"id":"b","name":"","concept":"","saveReason":"","vibe":"","slides":[],"claudeDesignPrompt":""},{"id":"c","name":"","concept":"","saveReason":"","vibe":"","slides":[],"claudeDesignPrompt":""}]}':'';
     const sys=BRAND+'\n'+rules+'\n'+(videoPlats.length?SCRIPT_RULE:'')+'\n'+(wantCarousel?CAROUSEL_RULE:'')+'\nRespond ONLY with valid JSON, no preamble, no markdown fences.';
     const user=`Write a complete social content pack for this product.
 
@@ -528,7 +536,7 @@ async function writePack(){
     }).join(',\n');
     const videoPlats = state.plats.filter(p=>['tiktok','instagram','youtube','facebook'].includes(p));
     const wantCarousel = state.plats.includes('instagram')||state.plats.includes('facebook');
-    const carouselSchema = wantCarousel ? ',\n"carousel": {"concept":"", "saveReason":"", "claudeDesignPrompt":"", "slides":[{"n":1,"overlay":"max 8 words","support":"","photo":"what to shoot"}]}' : '';
+    const carouselSchema = wantCarousel ? ',\n"carousel": {"options":[{"id":"a","name":"","concept":"","saveReason":"","vibe":"","slides":[{"n":1,"overlay":"","support":"","photo":""}],"claudeDesignPrompt":""},{"id":"b","name":"","concept":"","saveReason":"","vibe":"","slides":[],"claudeDesignPrompt":""},{"id":"c","name":"","concept":"","saveReason":"","vibe":"","slides":[],"claudeDesignPrompt":""}]}' : '';
     const scriptSchema = videoPlats.length ? ',\n"videoScript": {"duration":"e.g. 20 seconds", "format":"the format being filmed", "lines":[{"time":"0-2s","say":"exact words","shot":"what is on camera","keyword":true}]}' : '';
     const user = `APPROVED STRATEGY:\n${JSON.stringify(s)}\n\nPRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\n\nPLATFORM RULES, FOLLOW EXACTLY INCLUDING HASHTAG COUNTS:\n${rules}${videoPlats.length? '\n\n'+SCRIPT_RULE : ''}${wantCarousel? '\n\n'+CAROUSEL_RULE : ''}\n\nRespond with ONLY this JSON:\n{\n${schema}${scriptSchema}${carouselSchema}\n}`;
     let pack = deepSanitise(await callClaude(sys, user, 4000));
@@ -567,6 +575,7 @@ function qualityChecks(p, d){
 /* ==================== RENDER PACK ==================== */
 function renderPack(){
   const pk=state.pack; if(!pk) return;
+  window._state_pack_carousel_opts=(pk.carousel&&pk.carousel.options)||[];
   let html='';
   if(pk.videoScript && pk.videoScript.lines){
     const vs=pk.videoScript;
@@ -580,24 +589,32 @@ function renderPack(){
       '<div class="hint">'+esc(vs.duration||'')+(vs.format?' \u00b7 '+esc(vs.format):'')+' \u00b7 Bold lines carry your search keywords, say them clearly.</div>'+
       rows+'<button class="copybtn" onclick="copyText('+JSON.stringify(full)+', this)">Copy full script</button></div>';
   }
-  if(pk.carousel && pk.carousel.slides){
-    const c=pk.carousel;
-    const slides=c.slides.map(s=>
-      '<div style="border:1px solid var(--gold-pale);border-radius:12px;padding:11px;margin-top:9px;background:var(--cream)">'+
-      '<span class="tag" style="margin-bottom:5px;display:inline-block">Slide '+esc(s.n)+(s.n==1?' \u00b7 hook':(s.n==c.slides.length?' \u00b7 CTA':''))+'</span>'+
-      '<div class="serif" style="font-size:1.05rem;line-height:1.4">'+esc(s.overlay)+'</div>'+
-      (s.support?'<div style="font-size:.85rem;margin-top:3px">'+esc(s.support)+'</div>':'')+
-      '<div class="hint" style="margin-top:5px">Shoot: '+esc(s.photo)+'</div></div>').join('');
-    const full=c.slides.map(s=>'Slide '+s.n+': '+s.overlay+(s.support?'\n'+s.support:'')+'\nPhoto: '+s.photo).join('\n\n');
-    const designBtn = c.claudeDesignPrompt?
-      '<div class="subhead" style="margin-top:12px">Claude Design prompt, paste into claude.ai/design</div>'+
-      '<div class="out" style="font-size:.82rem">'+esc(c.claudeDesignPrompt)+'</div>'+
-      '<button class="copybtn" onclick="copyText('+JSON.stringify(c.claudeDesignPrompt)+', this)">Copy Claude Design prompt</button>':'';
-    html += '<div class="card"><span class="plat-head" style="background:var(--gold)">Carousel \u00b7 '+c.slides.length+' slides</span>'+
-      '<div style="font-size:.9rem;margin-bottom:2px"><b>Concept:</b> '+esc(c.concept)+'</div>'+
-      '<div class="hint">Why it gets saved: '+esc(c.saveReason||'')+'</div>'+slides+designBtn+
-      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px"><button class="copybtn" onclick="copyText('+JSON.stringify(full)+', this)">Copy all slides</button>'+
-      '<button class="copybtn" onclick="regenCarousel(this)">Different carousel idea</button></div></div>';
+  if(pk.carousel && pk.carousel.options){
+    const opts=pk.carousel.options||[];
+    const optLabels={a:'Product-Driven',b:'Printarelle Signature',c:'Wildcard'};
+    const optIcons={a:'\uD83C\uDFA8',b:'\u2728',c:'\uD83C\uDFB2'};
+    const optColors={a:'var(--pink-deep)',b:'var(--gold)',c:'var(--sage)'};
+    const tabsHtml=opts.map((o,i)=>'<button class="chip '+(i===0?'on':'')+' car-tab" data-caridx="'+i+'" onclick="switchCarTab('+i+')" style="border-color:'+optColors[o.id]+(i===0?';background:'+optColors[o.id]+';color:#fff':'')+'" >'+optIcons[o.id]+' '+esc(o.name||optLabels[o.id])+'</button>').join('');
+    let carHtml='<div class="card"><span class="plat-head" style="background:var(--ink)">\uD83D\uDCF1 Carousel, choose your style</span>'+
+      '<p class="hint" style="margin-bottom:10px">Three distinct directions. Pick one and tap Copy Claude Design prompt to build it in claude.ai/design, or tap Copy slides to build it in Canva.</p>'+
+      '<div class="chiprow" style="margin-bottom:14px">'+tabsHtml+'</div>';
+    opts.forEach((o,i)=>{
+      const slides=(o.slides||[]).map(s=>'<div style="border:1px solid var(--gold-pale);border-radius:12px;padding:11px;margin-top:8px;background:var(--cream)">'+
+        '<span class="tag" style="margin-bottom:4px;display:inline-block">Slide '+esc(s.n)+(s.n==1?' \u00b7 hook':(s.n==(o.slides||[]).length?' \u00b7 CTA':''))+'</span>'+
+        '<div class="serif" style="font-size:1.05rem;line-height:1.4">'+esc(s.overlay)+'</div>'+
+        (s.support?'<div style="font-size:.85rem;margin-top:3px;color:var(--ink-soft)">'+esc(s.support)+'</div>':'')+
+        '<div class="hint" style="margin-top:4px">\uD83D\uDCF7 '+esc(s.photo)+'</div></div>').join('');
+      const full=(o.slides||[]).map(s=>'Slide '+s.n+': '+s.overlay+(s.support?'\n'+s.support:'')+'\nShoot: '+s.photo).join('\n\n');
+      carHtml+='<div class="car-panel" id="car-panel-'+i+'" style="display:'+(i===0?'block':'none')+'">'+
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:baseline;margin-bottom:6px">'+
+        '<b class="serif" style="font-size:1.1rem">'+esc(o.name||optLabels[o.id])+'</b>'+
+        '<span class="hint" style="font-style:normal">'+esc(o.vibe||'')+'</span></div>'+
+        '<div class="hint" style="margin-bottom:4px">'+esc(o.concept)+'</div>'+
+        '<div class="hint">Why it gets saved: '+esc(o.saveReason)+'</div>'+slides+
+        (o.claudeDesignPrompt?'<div class="subhead" style="margin-top:12px">Claude Design prompt, paste at claude.ai/design</div><div class="out" style="font-size:.82rem">'+esc(o.claudeDesignPrompt)+'</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="copybtn" onclick="copyText('+JSON.stringify(o.claudeDesignPrompt)+', this)">Copy Claude Design prompt</button><button class="copybtn" onclick="copyText('+JSON.stringify(full)+', this)">Copy slides for Canva</button></div>':'')+'</div>';
+    });
+    carHtml+='<div style="margin-top:12px"><button class="copybtn" onclick="regenCarousel(this)">\uD83D\uDD04 Generate 3 fresh options</button></div></div>';
+    html+=carHtml;
   }
   for(const pid of state.plats){
     const d=pk[pid]; if(!d) continue;
@@ -631,15 +648,29 @@ function renderPack(){
   $('packBox').scrollIntoView({behavior:'smooth'});
 }
 
+/* ==================== CAROUSEL TABS ==================== */
+function switchCarTab(idx){
+  document.querySelectorAll('.car-tab').forEach((b,i)=>{
+    const o=(window._state_pack_carousel_opts||[])[i];
+    const colors={a:'var(--pink-deep)',b:'var(--gold)',c:'var(--sage)'};
+    const id=o?o.id:['a','b','c'][i];
+    b.style.background=i===idx?colors[id]:'';
+    b.style.color=i===idx?'#fff':'';
+    b.style.borderColor=colors[id];
+    b.classList.toggle('on',i===idx);
+  });
+  document.querySelectorAll('.car-panel').forEach((p,i)=>p.style.display=i===idx?'block':'none');
+}
+
 /* ==================== CAROUSEL REGEN ==================== */
 async function regenCarousel(btn){
   btn.textContent='Thinking...';
   try{
     const prod=currentProduct();
-    const prev = state.pack.carousel ? 'Do NOT repeat this previous concept: '+state.pack.carousel.concept : '';
+    const prev = (state.pack.carousel&&state.pack.carousel.options) ? 'Do NOT repeat any of these previous concepts: '+state.pack.carousel.options.map(o=>o.concept).join(', ') : '';
     const sys = BRAND+'\n'+CAROUSEL_RULE+'\nRespond ONLY with valid JSON, no preamble, no markdown fences.';
-    const user = `PRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\nSTRATEGY: ${JSON.stringify(state.strategy)}\n${prev}\nGive one fresh carousel with a clearly different angle and a new claudeDesignPrompt for claude.ai/design. Respond with ONLY this JSON:\n{"concept":"", "saveReason":"", "claudeDesignPrompt":"detailed prompt for claude.ai/design", "slides":[{"n":1,"overlay":"","support":"","photo":""}]}`;
-    state.pack.carousel = deepSanitise(await callClaude(sys, user, 1500));
+    const user = `PRODUCT: ${prod.title}\nDETAILS: ${prod.desc||'none'}\nGOAL: ${state.goal}\nOCCASION: ${briefOccasion()||'evergreen'}\nSTRATEGY: ${JSON.stringify(state.strategy)}\n${prev}\nGive one fresh carousel with a clearly different angle and a new claudeDesignPrompt for claude.ai/design. Respond with ONLY this JSON:\n{"options":[{"id":"a","name":"","concept":"","saveReason":"","vibe":"","slides":[{"n":1,"overlay":"","support":"","photo":""}],"claudeDesignPrompt":""},{"id":"b","name":"","concept":"","saveReason":"","vibe":"","slides":[],"claudeDesignPrompt":""},{"id":"c","name":"","concept":"","saveReason":"","vibe":"","slides":[],"claudeDesignPrompt":""}]}`;
+    state.pack.carousel = deepSanitise(await callClaude(sys, user, 3000));
     if(state.hist[0]) {state.hist[0].pack=state.pack; localStorage.setItem('pcb_hist', JSON.stringify(state.hist));}
     renderPack();
   }catch(e){ toast(e.message); btn.textContent='Different carousel idea'; }
